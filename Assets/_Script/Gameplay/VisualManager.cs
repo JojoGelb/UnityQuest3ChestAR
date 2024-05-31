@@ -11,7 +11,7 @@ public class VisualManager : Singleton<VisualManager>
 
     private void Start()
     {
-        GameManager.Instance.OnPieceSelected.AddListener(UpdateAccessibleTilesVisual);
+        GameManager.Instance.onPieceSelected.AddListener(UpdateAccessibleTilesVisual);
 
         //function to sort tilesVisual
     }

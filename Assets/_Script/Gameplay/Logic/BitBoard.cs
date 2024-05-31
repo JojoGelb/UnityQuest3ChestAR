@@ -34,7 +34,7 @@ public class BitBoard
         Debug.Assert(i < Size*Size, "Error : Index out of range");
         return new Vector2(i % Size,  (float) Math.Floor(i / (float) Size));
     }
-    public List<Vector2> GetValidPositions()
+    public List<Vector2> GetValidMoves()
     {
         var positions = new List<Vector2>();
         for (var i = 0; i < Size*Size; i++)

@@ -3,10 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+public enum MoveState
+{
+    Failed, Success, Eaten
+}
+
 public class GameManager : Singleton<GameManager>
 {
-
-    public UnityEvent<List<Vector2>> OnPieceSelected = new UnityEvent<List<Vector2>>();
+    private readonly Board _board = new();
+    private readonly BitBoard _currentBitBoard = new();
+    private Vector2 _currentPiece;
+    
+    public UnityEvent<List<Vector2>> onPieceSelected = new ();
 
     public void InstantiateBoard()
     {
@@ -15,21 +23,22 @@ public class GameManager : Singleton<GameManager>
 
     public void SelectPiece(int x, int y)
     {
+        _currentPiece = new Vector2(x, y);
+        
         //call to logic to get available position on board
-
-
-        OnPieceSelected.Invoke(new List<Vector2>());
+        
+        onPieceSelected.Invoke(_currentBitBoard.GetValidMoves());
     }
     
     public MoveState MoveTo(int x, int y)
     {
-        //call to logic to know if move is possible
-
-        if(true/*Test si result est eaten*/)
+        var newPosition = new Vector2(x, y);
+        
+        if(_currentBitBoard.Get(newPosition))
         {
-            //update death row
+            return _board.Move(_currentPiece, newPosition) ? MoveState.Eaten : MoveState.Success;
         }
 
-        return MoveState.Success;
+        return MoveState.Failed;
     }
 }
