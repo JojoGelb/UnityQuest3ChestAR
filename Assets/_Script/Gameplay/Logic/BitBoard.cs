@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BitBoard
@@ -26,6 +28,21 @@ public class BitBoard
     {
         _data[y * Size + x] = data;
     }
+
+    private static Vector2 GetPosition(int i)
+    {
+        Debug.Assert(i < Size*Size, "Error : Index out of range");
+        return new Vector2(i % Size,  (float) Math.Floor(i / (float) Size));
+    }
+    public List<Vector2> GetValidPositions()
+    {
+        var positions = new List<Vector2>();
+        for (var i = 0; i < Size*Size; i++)
+        {
+            if (_data[i]) positions.Add( GetPosition(i));
+        }
+        return positions;
+    } 
 
 }
 
