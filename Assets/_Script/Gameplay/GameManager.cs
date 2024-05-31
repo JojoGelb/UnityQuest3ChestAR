@@ -20,13 +20,8 @@ public class GameManager : Singleton<GameManager>
 
         OnPieceSelected.Invoke(new List<Vector2>());
     }
-
-    /*Implémenter un enum comme type de retour dans Moveto:
-        Failed,
-        Success,
-        Eaten
-     */
-    public bool MoveTo(int x, int y)
+    
+    public MoveState MoveTo(int x, int y)
     {
         //call to logic to know if move is possible
 
@@ -35,6 +30,6 @@ public class GameManager : Singleton<GameManager>
             //update death row
         }
 
-        return false;
+        return MoveState.Success;
     }
 }
