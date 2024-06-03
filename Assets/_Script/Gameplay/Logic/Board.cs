@@ -5,16 +5,21 @@ public enum Type
     None, Pawn, Bishop, Knight, Rook, Queen, King, 
 }
 
+public enum TeamColor
+{ 
+    Black, White
+}
+
 public struct Piece
 {
-    public Piece(Type t, bool c)
+    public Piece(Type t, TeamColor c)
     {
         Type = t;
         Color = c;
     }
 
     public Type Type { get; }
-    public bool Color { get; }
+    public TeamColor Color { get; }
 }
 
 public class Board
@@ -28,7 +33,7 @@ public class Board
         _data = new Piece[Size*Size];
         for (var i = 0; i < Size*Size; i++)
         {
-            _data[i] = new Piece(Type.None, false);
+            _data[i] = new Piece(Type.None, TeamColor.Black);
         }
         
     }
