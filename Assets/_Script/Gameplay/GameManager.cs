@@ -41,4 +41,8 @@ public class GameManager : Singleton<GameManager>
 
         return MoveState.Failed;
     }
+
+    public Board GetBoard() { return _board; }
+    public BitBoard GetCurrentBitBoard() { return _currentBitBoard; }
+    public Vector2 GetCurrentPiece() { return _currentPiece; }
 }
