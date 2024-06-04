@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum Type
+public enum PieceType
 {
     None, Pawn, Bishop, Knight, Rook, Queen, King, 
 }
@@ -12,13 +12,13 @@ public enum TeamColor
 
 public struct Piece
 {
-    public Piece(Type t, TeamColor c)
+    public Piece(PieceType t, TeamColor c)
     {
         Type = t;
         Color = c;
     }
 
-    public Type Type { get; }
+    public PieceType Type { get; }
     public TeamColor Color { get; }
 }
 
@@ -33,7 +33,7 @@ public class Board
         _data = new Piece[Size*Size];
         for (var i = 0; i < Size*Size; i++)
         {
-            _data[i] = new Piece(Type.None, TeamColor.Black);
+            _data[i] = new Piece(PieceType.None, TeamColor.Black);
         }
         
     }
@@ -56,7 +56,7 @@ public class Board
     }
     public bool Move(int sx, int sy, int fx, int fy)
     {
-        var result = Get(fx, fy).Type != Type.None;
+        var result = Get(fx, fy).Type != PieceType.None;
         
         //Move (sx, sy) to (fx, fy)
         Set(sx, sy, Get(fx, fy));

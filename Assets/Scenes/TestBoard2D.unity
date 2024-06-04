@@ -382,32 +382,83 @@ MonoBehaviour:
   m_GameObject: {fileID: 1226225319}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3dd3cd0db0efc5440b820d0400d25c0b, type: 3}
+  m_Script: {fileID: 11500000, guid: 8d3f138b5b7c67e4f9949da11bb3c0fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blackPiecePrefabs:
-  - {fileID: 1000013351177638, guid: 411f5295934dd1c4eb5916e3c649f0a7, type: 3}
-  - {fileID: 1000010201698906, guid: edd10668f6a183d4180f8dc7b94f9e5c, type: 3}
-  - {fileID: 1000012633253314, guid: 8c44c8a6238ea0148bc07d2371dedc74, type: 3}
-  - {fileID: 1000011492277074, guid: 99331e88befbef94bbad253e659776ba, type: 3}
-  - {fileID: 1000013427829390, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
-  - {fileID: 1000014207659374, guid: 61ed95d5d9afc0842b0c4d0c96678d38, type: 3}
-  whitePiecePrefabs: []
-  blackPieceOrigin: {fileID: 1226225322}
-  whitePieceOrigin: {fileID: 1226225321}
-  blackPieceStep: 0.06
-  whitePieceStep: 0.06
-  boardSize: 8
---- !u!4 &1226225321 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4929159865320783765, guid: 857381d11efac0a4d91a3b3b8b94a827, type: 3}
-  m_PrefabInstance: {fileID: 1226225318}
-  m_PrefabAsset: {fileID: 0}
+  bottomLeftSquareTransform: {fileID: 1226225322}
+  squareSize: 0.06
 --- !u!4 &1226225322 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5446945384773629866, guid: 857381d11efac0a4d91a3b3b8b94a827, type: 3}
   m_PrefabInstance: {fileID: 1226225318}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1310882674
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1310882677}
+  - component: {fileID: 1310882676}
+  - component: {fileID: 1310882675}
+  m_Layer: 0
+  m_Name: GameMaster
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1310882675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310882674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98f2ff053bd210d43847e418a56147cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingBoardLayout: {fileID: 11400000, guid: f305cf3b523620a478a44693c5a6ff8e, type: 2}
+  board: {fileID: 1226225320}
+--- !u!114 &1310882676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310882674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bda4e75f56d68d4587bd17f1b50d917, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  piecesPrefabs:
+  - {fileID: 1000010201698906, guid: 4ec96da504e21a44f90910dc16abe5aa, type: 3}
+  - {fileID: 1000012633253314, guid: b6d056118d863e14ea14128611f5cb0a, type: 3}
+  - {fileID: 1000011492277074, guid: 5b0d17116cc07f74a814dd853b2a6aba, type: 3}
+  - {fileID: 1000013427829390, guid: 981549534f9628d44a95898342954b8d, type: 3}
+  - {fileID: 1000014207659374, guid: 812da767e1cb05c4c865cf1a3f1304cb, type: 3}
+  blackMaterial: {fileID: 2100000, guid: 973635ff02379f4429b7df0543346d32, type: 2}
+  whiteMaterial: {fileID: 2100000, guid: b391301c47109a144bbb6408e48da028, type: 2}
+--- !u!4 &1310882677
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310882674}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -415,3 +466,4 @@ SceneRoots:
   - {fileID: 378718299}
   - {fileID: 64758379}
   - {fileID: 1226225318}
+  - {fileID: 1310882677}

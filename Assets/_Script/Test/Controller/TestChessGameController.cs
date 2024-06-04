@@ -7,7 +7,7 @@ using UnityEngine;
 public class TestChessGameController : MonoBehaviour
 {
     [SerializeField] private BoardLayout startingBoardLayout;
-    [SerializeField] private Board board;
+    [SerializeField] private VisualBoard board;
 
     private PieceCreator piecesCreator;
    
@@ -39,7 +39,9 @@ public class TestChessGameController : MonoBehaviour
         {
             Vector2Int squareCoords = layout.GetSquaresCoordsAtIndex(i);
             TeamColor team = layout.GetSquareTeamColorAtIndex(i);
-            Type type = layout.GetSquarePieceNameAtIndex(i);
+            string typeName = layout.GetSquarePieceNameAtIndex(i);
+
+            Type type = Type.GetType(typeName);
 
             CreatePiecesAndInitialize(squareCoords, team, type);
         }
@@ -47,8 +49,10 @@ public class TestChessGameController : MonoBehaviour
 
     private void CreatePiecesAndInitialize(Vector2Int squareCoords, TeamColor team, Type type)
     {
-        Piece newPiece = piecesCreator.CreatePiece(type).GetComponent<Piece>();
-
-        // TODO set piece data
+        VisualPiece newPiece = piecesCreator.CreatePiece(type).GetComponent<VisualPiece>();
+        newPiece.SetData(squareCoords, team, board);
+        
+        Material teamMaterial = piecesCreator.GetTeamMaterial(team);
+        newPiece.SetMaterial(teamMaterial);
     }
 }

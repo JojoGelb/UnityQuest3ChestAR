@@ -12,4 +12,100 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e457f3f7e3ff6644698a561aa49109f8, type: 3}
   m_Name: Starting Board Layout
   m_EditorClassIdentifier: 
-  boardSquares: []
+  boardSquares:
+  - position: {x: 1, y: 1}
+    pieceType: 4
+    TeamColor: 0
+  - position: {x: 1, y: 2}
+    pieceType: 3
+    TeamColor: 0
+  - position: {x: 1, y: 3}
+    pieceType: 2
+    TeamColor: 0
+  - position: {x: 1, y: 4}
+    pieceType: 5
+    TeamColor: 0
+  - position: {x: 1, y: 5}
+    pieceType: 6
+    TeamColor: 0
+  - position: {x: 1, y: 6}
+    pieceType: 2
+    TeamColor: 0
+  - position: {x: 1, y: 7}
+    pieceType: 3
+    TeamColor: 0
+  - position: {x: 1, y: 8}
+    pieceType: 4
+    TeamColor: 0
+  - position: {x: 2, y: 1}
+    pieceType: 1
+    TeamColor: 0
+  - position: {x: 2, y: 2}
+    pieceType: 1
+    TeamColor: 0
+  - position: {x: 2, y: 3}
+    pieceType: 1
+    TeamColor: 0
+  - position: {x: 2, y: 4}
+    pieceType: 1
+    TeamColor: 0
+  - position: {x: 2, y: 5}
+    pieceType: 1
+    TeamColor: 0
+  - position: {x: 2, y: 6}
+    pieceType: 1
+    TeamColor: 0
+  - position: {x: 2, y: 7}
+    pieceType: 1
+    TeamColor: 0
+  - position: {x: 2, y: 8}
+    pieceType: 1
+    TeamColor: 0
+  - position: {x: 8, y: 1}
+    pieceType: 4
+    TeamColor: 1
+  - position: {x: 8, y: 2}
+    pieceType: 3
+    TeamColor: 1
+  - position: {x: 8, y: 3}
+    pieceType: 2
+    TeamColor: 1
+  - position: {x: 8, y: 4}
+    pieceType: 4
+    TeamColor: 1
+  - position: {x: 8, y: 5}
+    pieceType: 6
+    TeamColor: 1
+  - position: {x: 8, y: 6}
+    pieceType: 2
+    TeamColor: 1
+  - position: {x: 8, y: 7}
+    pieceType: 3
+    TeamColor: 1
+  - position: {x: 8, y: 8}
+    pieceType: 4
+    TeamColor: 1
+  - position: {x: 7, y: 1}
+    pieceType: 1
+    TeamColor: 1
+  - position: {x: 7, y: 2}
+    pieceType: 1
+    TeamColor: 1
+  - position: {x: 7, y: 3}
+    pieceType: 1
+    TeamColor: 1
+  - position: {x: 7, y: 4}
+    pieceType: 1
+    TeamColor: 1
+  - position: {x: 7, y: 5}
+    pieceType: 1
+    TeamColor: 1
+  - position: {x: 7, y: 6}
+    pieceType: 1
+    TeamColor: 1
+  - position: {x: 7, y: 7}
+    pieceType: 1
+    TeamColor: 1
+  - position: {x: 7, y: 8}
+    pieceType: 1
+    TeamColor: 1

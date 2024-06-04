@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,7 +15,7 @@ public class PieceCreator : MonoBehaviour
     {
         foreach (var piece in piecesPrefabs) 
         {
-            nameToPieceDict.Add(piece.GetComponent<Piece>().GetType().ToString(), piece);
+            nameToPieceDict.Add(piece.GetComponent<VisualPiece>().GetType().ToString(), piece);
         }
     }
 
@@ -29,8 +30,8 @@ public class PieceCreator : MonoBehaviour
     }
 
 
-    public Material GetTeamMaterial(bool team) 
+    public Material GetTeamMaterial(TeamColor team) 
     {
-        return team ? blackMaterial : whiteMaterial;
+        return team == TeamColor.White ? blackMaterial : whiteMaterial;
     }
 }

@@ -11,7 +11,7 @@ public class BoardLayout : ScriptableObject
     private class BoardSquareSetup
     {
         public Vector2Int position;
-        public Type pieceType;
+        public PieceType pieceType;
         public TeamColor TeamColor;
     }
 
@@ -32,13 +32,13 @@ public class BoardLayout : ScriptableObject
         return new Vector2Int(boardSquares[index].position.x - 1, boardSquares[index].position.y - 1);
     }
 
-    public Type GetSquarePieceNameAtIndex(int index) 
+    public string GetSquarePieceNameAtIndex(int index) 
     {
         if (boardSquares.Length <= index) {
             Debug.LogError("Index of piece is out of range");
-            return Type.None;
+            return "";
         }
-        return boardSquares[index].pieceType;
+        return boardSquares[index].pieceType.ToString();
     }
 
     public TeamColor GetSquareTeamColorAtIndex(int index) 
