@@ -10,31 +10,43 @@ public enum MoveState
 
 public class GameManager : Singleton<GameManager>
 {
+    [SerializeField]
+    private VisualManager visualManager;
+
+    //private LogicManager logicManager;
+
+
+    //TO IMPLEMENT IN LOGIC ----------------
     private readonly Board _board = new();
     private readonly BitBoard _currentBitBoard = new();
     private Vector2 _currentPiece;
+    // --------------------------------
     
     public UnityEvent<List<Vector2>> onPieceSelected = new ();
 
-    public void InstantiateBoard()
+    private void Start()
     {
-        //Instantiate logic here: use string to tell the 
+        //logicManager = new LogicManager();
     }
 
-    public void SelectPiece(int x, int y)
+    public void SelectPiece(Vector2 position)
     {
-        _currentPiece = new Vector2(x, y);
-        
-        //call to logic to get available position on board
-        
-        onPieceSelected.Invoke(_currentBitBoard.GetValidMoves());
+        _currentPiece = position;
+
+        //call to logic to get available position on board => logicManager.GetValidMoves(positionSelectedPiece);
+        List<Vector2> pieces = _currentBitBoard.GetValidMoves();
+
+        //Call event to notify visualManager
+        onPieceSelected.Invoke(pieces);
     }
     
     public MoveState MoveTo(int x, int y)
     {
         var newPosition = new Vector2(x, y);
-        
-        if(_currentBitBoard.Get(newPosition))
+        //call to logic to move piece on board => return logicManager.MoveTo(newPosition);
+        //Update visual according to returned enum
+
+        if (_currentBitBoard.Get(newPosition))
         {
             return _board.Move(_currentPiece, newPosition) ? MoveState.Eaten : MoveState.Success;
         }
@@ -42,7 +54,10 @@ public class GameManager : Singleton<GameManager>
         return MoveState.Failed;
     }
 
+
+    //TO IMPLEMENT IN LOGIC ----------------
     public Board GetBoard() { return _board; }
     public BitBoard GetCurrentBitBoard() { return _currentBitBoard; }
     public Vector2 GetCurrentPiece() { return _currentPiece; }
+    // --------------------------------
 }
