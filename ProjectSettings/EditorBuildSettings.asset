@@ -4,7 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Jojo.unity
+    guid: b3e1bf110045c7e4695a1a5bb2002bf4
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 8236754a343a7b14eb93b6e2523ac52e, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: d149ff3b31e2e5d4da24405037a8034b, type: 2}

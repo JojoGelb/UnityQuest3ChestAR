@@ -1,14 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.Rendering;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Scriptable Objects/Board/Layout")]
 public class BoardLayout : ScriptableObject
 {
     [Serializable]
-    private class BoardSquareSetup
+    public class BoardSquareSetup
     {
         public Vector2Int position;
         public PieceType pieceType;
@@ -17,6 +14,8 @@ public class BoardLayout : ScriptableObject
 
     [SerializeField] private BoardSquareSetup[] boardSquares;
 
+    [HideInInspector]
+    public BoardSquareSetup[] BoardSquares { get { return boardSquares; }}
     public int GetPiecesCount() 
     {
         return boardSquares.Length;

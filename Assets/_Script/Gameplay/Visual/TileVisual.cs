@@ -6,6 +6,8 @@ public class TileVisual : MonoBehaviour
 {
     [SerializeField]
     public GameObject visual;
+    public Color possibleMoveTileColor = Color.yellow;
+    public Color selectedTileColor = Color.green;
 
     public Vector2 position;
 
@@ -13,30 +15,56 @@ public class TileVisual : MonoBehaviour
 
     public Vector3 distanceBetweenTiles;
 
+    public PieceVisual CurrentPieceOnTile;
+
     public bool IsIlluminated {  get; private set; }
 
-    [ContextMenu("PlaceOnMap")]
-    public void PlaceTileOnMap()
+    // Testing line: enable movement on whole board
+    private void Start()
     {
-        for(int i = 0; i < 8; i++)
-        {
-            for(int j = 0; j < 8; j++)
-            {
-                GameObject g = Instantiate(gameObject,transform.position, Quaternion.identity,transform.parent);
-                g.transform.localPosition = transform.localPosition + new Vector3(distanceBetweenTiles.x * i, distanceBetweenTiles.y * j,0);
-                TileVisual tileVisual = g.GetComponent<TileVisual>();
-                tileVisual.position = new Vector2(j, i);
-                g.name = "Tile_X" + i + "_Y" + j;
-            }
-        }
+        ToggleHighlightVisual(true);
     }
 
     public void ToggleHighlightVisual(bool On)
     {
         if (visual != null)
         {
+            if (On == false)
+            {
+                visual.GetComponent<Renderer>().material.color = possibleMoveTileColor;
+            }
+
             visual.SetActive(On);
             IsIlluminated = On;
+        }
+    }
+
+    public void ChangeLightVisual(bool isSelected)
+    {
+        if(isSelected)
+        {
+            visual.GetComponent<Renderer>().material.color = selectedTileColor;
+        }else
+        {
+            visual.GetComponent<Renderer>().material.color = possibleMoveTileColor;
+        }
+    }
+
+    /*Code below not relevant: speed up implementation and test process*/
+
+    [ContextMenu("PlaceOnMap")]
+    public void PlaceTileOnMap()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                GameObject g = Instantiate(gameObject, transform.position, Quaternion.identity, transform.parent);
+                g.transform.localPosition = transform.localPosition + new Vector3(distanceBetweenTiles.x * j, distanceBetweenTiles.y * i, 0);
+                TileVisual tileVisual = g.GetComponent<TileVisual>();
+                tileVisual.position = new Vector2(j, i);
+                g.name = "Tile_X" + j + "_Y" + i;
+            }
         }
     }
 

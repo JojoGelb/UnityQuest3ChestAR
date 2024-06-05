@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.tvOS;
 
 [RequireComponent(typeof(MaterialSetter))]
 public abstract class VisualPiece : MonoBehaviour
