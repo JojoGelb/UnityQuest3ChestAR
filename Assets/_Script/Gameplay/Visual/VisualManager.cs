@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 public class VisualManager : Singleton<VisualManager>
 {
-    public List<TileVisual> tilesVisual = new List<TileVisual>();
+    [SerializeField] private List<TileVisual> tilesVisual = new List<TileVisual>();
 
     // i < 6 -> white
     // i > 5 -> black
@@ -15,16 +15,16 @@ public class VisualManager : Singleton<VisualManager>
     // 3 knight
     // 4 bishop
     // 5 pawn
-    public List<GameObject> piecesPrefab = new List<GameObject>();
-    public Transform parentTransformPieceInstantiate;
-    
-    public BoardLayout boardLayout;
+    [SerializeField] private List<GameObject> piecesPrefab = new List<GameObject>();
+    [SerializeField] private Transform parentTransformPieceInstantiate;
+    [SerializeField] private BoardLayout boardLayout;
 
     private List<TileVisual> illuminatedTile = new List<TileVisual>();
 
     private void Start()
     {
         GameManager.Instance.onPieceSelected.AddListener(UpdateAccessibleTilesVisual);
+        PlacePieceOnBoard();
     }
 
     private void UpdateAccessibleTilesVisual(List<Vector2> accessibleTiles)
@@ -45,25 +45,11 @@ public class VisualManager : Singleton<VisualManager>
         }
     }
 
-    public void MovePieceToTile(PieceVisual piece, Vector2 destination)
+    public TileVisual GetTileVisualAtLocation(Vector2 location)
     {
-        TileVisual oldTile = tilesVisual[(int)(piece.position.y * 8 + piece.position.x)];
-        TileVisual newTile = tilesVisual[(int)(destination.y * 8 + destination.x)];
-        piece.transform.parent = newTile.transform;
-        piece.position = destination;
-        piece.transform.localPosition = Vector3.zero;
-
-        if(newTile.CurrentPieceOnTile != null)
-        {
-            Destroy(newTile.CurrentPieceOnTile.gameObject);
-        }
-
-        newTile.CurrentPieceOnTile = piece;
-        oldTile.CurrentPieceOnTile = null;
-
+        return tilesVisual[(int)(location.y * 8 + location.x)];
     }
 
-    [ContextMenu("Place Pieces on board")]
     public void PlacePieceOnBoard()
     {
         foreach(BoardLayout.BoardSquareSetup boardSquare in boardLayout.BoardSquares)
@@ -91,8 +77,9 @@ public class VisualManager : Singleton<VisualManager>
             }
             GameObject g = Instantiate(piecesPrefab[index], Vector3.zero, Quaternion.identity, parentTransformPieceInstantiate);
             PieceVisual p = g.GetComponent<PieceVisual>();
-            p.position = new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1);
-            MovePieceToTile(p, p.position);
+            new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1);
+            
+            p.MovePieceToTile(new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1));
         }
     }
 }

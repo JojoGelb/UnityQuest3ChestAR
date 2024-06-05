@@ -5,19 +5,16 @@ using UnityEngine;
 
 public class PieceVisual : MonoBehaviour
 {
-    public Vector2 position;
+    public Vector2 Position { get; private set; }
+    public IInteractableView InteractableView { get; private set; }
 
-    List<TileVisual> tiles = new List<TileVisual>();
-
-    TileVisual lastClosestIlluminatedTile;
-
-    //AR logic for grab
-    public bool isGrabbed = false;
+    private List<TileVisual> tilesNearby = new List<TileVisual>();
+    private TileVisual lastClosestIlluminatedTile;
+    private bool isGrabbed = false;
 
     [SerializeField, Interface(typeof(IInteractableView))]
     private UnityEngine.Object _interactableView;
 
-    public IInteractableView InteractableView;
 
     private void Awake()
     {
@@ -27,6 +24,21 @@ public class PieceVisual : MonoBehaviour
     private void Start()
     {
         InteractableView.WhenStateChanged += OnStateChanged;
+    }
+
+    private void Update()
+    {
+        if (isGrabbed)
+        {
+            int indexClosestIlluminatedTile = GetClosestIlluminatedTile();
+            if (indexClosestIlluminatedTile == -1) return;
+            if (lastClosestIlluminatedTile != tilesNearby[indexClosestIlluminatedTile])
+            {
+                lastClosestIlluminatedTile?.ChangeLightVisual(false);
+                lastClosestIlluminatedTile = tilesNearby[indexClosestIlluminatedTile];
+                lastClosestIlluminatedTile.ChangeLightVisual(true);
+            }
+        }
     }
 
     private void OnStateChanged(InteractableStateChangeArgs args)
@@ -49,22 +61,23 @@ public class PieceVisual : MonoBehaviour
         }
     }
 
-    public void OnPieceSelected()
+    private void OnPieceSelected()
     {
-        GameManager.Instance.SelectPiece(position);
+        GameManager.Instance.SelectPiece(Position);
         isGrabbed=true;
     }
 
-    [ContextMenu("OnPieceDrop")]
-    public void OnPieceDrop()
+
+    private void OnPieceDrop()
     {
+        if (!isGrabbed) return;
         isGrabbed = false;
         transform.rotation = Quaternion.identity;
         //get position player want to move to
-        if(tiles.Count == 0)
+        if(tilesNearby.Count == 0)
         {
             //Failed: no tile in range
-            VisualManager.Instance.MovePieceToTile(this, position);
+            MovePieceToTile(Position);
 
             return;
         }
@@ -74,56 +87,42 @@ public class PieceVisual : MonoBehaviour
         if (indexClosestIlluminatedTile == -1)
         {
             //Failed: no illuminated tile in range
-            VisualManager.Instance.MovePieceToTile(this, position);
+            MovePieceToTile(Position);
             return;
         }
 
-        Vector2 destination = tiles[indexClosestIlluminatedTile].position;
+        Vector2 destination = tilesNearby[indexClosestIlluminatedTile].position;
 
         //ask manager if move is possible
-        //MoveState result = GameManager.Instance.MoveTo((int)destination.x,(int)destination.y);
+        MoveState result = GameManager.Instance.MoveTo((int)destination.x,(int)destination.y);
         // Debug line: allow to place piece everytime
-        MoveState result = MoveState.Success;
+        //MoveState result = MoveState.Success;
 
         switch (result)
         {
             case MoveState.Success:
             case MoveState.Eaten:
-                VisualManager.Instance.MovePieceToTile(this, destination);
+                MovePieceToTile(destination);
                 lastClosestIlluminatedTile = null;
                 break;
 
             case MoveState.Failed:
-                VisualManager.Instance.MovePieceToTile(this, position);
+                MovePieceToTile(Position);
                 lastClosestIlluminatedTile = null;
                 break;
         }
     }
 
-    private void Update()
-    {
-        if (isGrabbed)
-        {
-            int indexClosestIlluminatedTile = GetClosestIlluminatedTile();
-            if (indexClosestIlluminatedTile == -1) return;
-            if (lastClosestIlluminatedTile != tiles[indexClosestIlluminatedTile])
-            {
-                lastClosestIlluminatedTile?.ChangeLightVisual(false);
-                lastClosestIlluminatedTile = tiles[indexClosestIlluminatedTile];
-                lastClosestIlluminatedTile.ChangeLightVisual(true);
-            }
-        }
-    }
     private int GetClosestIlluminatedTile()
     {
         int indexClosestIlluminatedTile = -1;
         float minDistance = float.MaxValue;
 
-        for (int i = 0; i < tiles.Count; i++)
+        for (int i = 0; i < tilesNearby.Count; i++)
         {
-            if (tiles[i].IsIlluminated)
+            if (tilesNearby[i].IsIlluminated)
             {
-                float distance = Vector3.Distance(tiles[i].transform.position, transform.position);
+                float distance = Vector3.Distance(tilesNearby[i].transform.position, transform.position);
                 if (distance < minDistance)
                 {
                     indexClosestIlluminatedTile = i;
@@ -135,11 +134,29 @@ public class PieceVisual : MonoBehaviour
         return indexClosestIlluminatedTile;
     }
 
+    public void MovePieceToTile(Vector2 destination)
+    {
+        TileVisual oldTile = VisualManager.Instance.GetTileVisualAtLocation(Position);
+        TileVisual newTile = VisualManager.Instance.GetTileVisualAtLocation(destination);
+
+        transform.parent = newTile.transform;
+        Position = destination;
+        transform.localPosition = Vector3.zero;
+
+        if (newTile.CurrentPieceOnTile != null)
+        {
+            Destroy(newTile.CurrentPieceOnTile.gameObject);
+        }
+
+        newTile.CurrentPieceOnTile = this;
+        oldTile.CurrentPieceOnTile = null;
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if(other.TryGetComponent(out TileVisual t))
         {
-            tiles.Add(t);
+            tilesNearby.Add(t);
         }
     }
 
@@ -147,7 +164,7 @@ public class PieceVisual : MonoBehaviour
     {
         if (other.TryGetComponent(out TileVisual t))
         {
-            tiles.Remove(t);
+            tilesNearby.Remove(t);
         }
     }
 }

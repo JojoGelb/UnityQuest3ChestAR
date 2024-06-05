@@ -4,26 +4,26 @@ using UnityEngine;
 
 public class TileVisual : MonoBehaviour
 {
-    [SerializeField]
-    public GameObject visual;
-    public Color possibleMoveTileColor = Color.yellow;
-    public Color selectedTileColor = Color.green;
 
-    public Vector2 position;
+    [SerializeField] private GameObject visual;
+    [SerializeField] private Color possibleMoveTileColor = Color.yellow;
+    [SerializeField] private Color selectedTileColor = Color.green;
+
+    [field: SerializeField] public Vector2 position { get; private set; }
 
     [Header("Algo de placement scene en mode editor")]
 
-    public Vector3 distanceBetweenTiles;
+    [SerializeField] private Vector3 distanceBetweenTiles;
 
     public PieceVisual CurrentPieceOnTile;
 
     public bool IsIlluminated {  get; private set; }
 
     // Testing line: enable movement on whole board
-    private void Start()
+    /*private void Start()
     {
         ToggleHighlightVisual(true);
-    }
+    }*/
 
     public void ToggleHighlightVisual(bool On)
     {
@@ -50,7 +50,9 @@ public class TileVisual : MonoBehaviour
         }
     }
 
+    /// //////////////////////////////////////////////////////////////
     /*Code below not relevant: speed up implementation and test process*/
+    /// ///////////////////////////////////////////////////////////////
 
     [ContextMenu("PlaceOnMap")]
     public void PlaceTileOnMap()
