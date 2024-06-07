@@ -25,7 +25,7 @@ public class LogicManager
         foreach (var boardSquare in _boardLayout.BoardSquares)
         {
             _board.Set(
-                boardSquare.position, 
+                boardSquare.position - new Vector2(1, 1), 
                 new Piece(boardSquare.pieceType, boardSquare.TeamColor == TeamColor.White)
             );
         }
@@ -42,7 +42,7 @@ public class LogicManager
                 var piece = _board.Get(x, y);
                 var square = new BoardLayout.BoardSquareSetup
                 {
-                    position = new Vector2Int(x, y),
+                    position = new Vector2Int(x + 1, y + 1),
                     pieceType = piece.Type,
                     TeamColor = piece.Color ? TeamColor.White : TeamColor.Black
                 };
@@ -56,7 +56,7 @@ public class LogicManager
 
     public List<Vector2> SelectPiece(Vector2 position)
     {
-        _currentPiece = position;
+        _currentPiece = position - new Vector2(1, 1);
         ManageValidMoves(); //Update BitBoard
         
         return _currentBitBoard.GetValidMoves();
@@ -64,7 +64,7 @@ public class LogicManager
     
     public MoveState MoveTo(int x, int y)
     {
-        var newPosition = new Vector2(x, y);
+        var newPosition = new Vector2(x - 1, y - 1);
         
         if (_currentBitBoard.Get(newPosition))
         {

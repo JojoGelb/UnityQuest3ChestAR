@@ -39,7 +39,7 @@ public class BitBoard
         var positions = new List<Vector2>();
         for (var i = 0; i < Size*Size; i++)
         {
-            if (_data[i]) positions.Add( GetPosition(i));
+            if (_data[i]) positions.Add( GetPosition(i) + new Vector2(1, 1));
         }
         return positions;
     } 
