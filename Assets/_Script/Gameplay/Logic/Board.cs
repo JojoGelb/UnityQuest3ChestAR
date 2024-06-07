@@ -12,20 +12,20 @@ public enum TeamColor
 
 public struct Piece
 {
-    public Piece(PieceType t, TeamColor c)
+    public Piece(PieceType t, bool c)
     {
         Type = t;
         Color = c;
     }
 
     public PieceType Type { get; }
-    public TeamColor Color { get; }
+    public bool Color { get; }
 }
 
 public class Board
 {
     private readonly Piece[] _data;
-    private const int Size = 8; 
+    public const int Size = 8;
     
     public Board()
     {
@@ -33,7 +33,7 @@ public class Board
         _data = new Piece[Size*Size];
         for (var i = 0; i < Size*Size; i++)
         {
-            _data[i] = new Piece(PieceType.None, TeamColor.Black);
+            _data[i] = new Piece(PieceType.None, false);
         }
         
     }
