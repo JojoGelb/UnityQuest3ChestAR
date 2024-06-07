@@ -40,6 +40,8 @@ public class LogicManager
             for (var y = 0; y < Board.Size; y++)
             {
                 var piece = _board.Get(x, y);
+                if(piece.Type == PieceType.None) continue;
+
                 var square = new BoardLayout.BoardSquareSetup
                 {
                     position = new Vector2Int(x + 1, y + 1),
