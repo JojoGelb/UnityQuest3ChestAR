@@ -17,14 +17,47 @@ public class VisualManager : Singleton<VisualManager>
     // 5 pawn
     [SerializeField] private List<GameObject> piecesPrefab = new List<GameObject>();
     [SerializeField] private Transform parentTransformPieceInstantiate;
-    [SerializeField] private BoardLayout boardLayout;
 
     private List<TileVisual> illuminatedTile = new List<TileVisual>();
 
-    private void Start()
+    protected override void Awake()
     {
+        base.Awake();
+        GameManager.Instance.onBoardInit.AddListener(InitBoard);
         GameManager.Instance.onPieceSelected.AddListener(UpdateAccessibleTilesVisual);
-        PlacePieceOnBoard();
+    }
+
+    private void InitBoard(BoardLayout.BoardSquareSetup[] board)
+    {
+        foreach (BoardLayout.BoardSquareSetup boardSquare in board)
+        {
+            int index = boardSquare.TeamColor == TeamColor.White ? 0 : 6;
+            switch (boardSquare.pieceType)
+            {
+                case PieceType.King:
+                    break;
+                case PieceType.Queen:
+                    index += 1;
+                    break;
+                case PieceType.Rook:
+                    index += 2;
+                    break;
+                case PieceType.Knight:
+                    index += 3;
+                    break;
+                case PieceType.Bishop:
+                    index += 4;
+                    break;
+                case PieceType.Pawn:
+                    index += 5;
+                    break;
+            }
+            GameObject g = Instantiate(piecesPrefab[index], Vector3.zero, Quaternion.identity, parentTransformPieceInstantiate);
+            PieceVisual p = g.GetComponent<PieceVisual>();
+            new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1);
+
+            p.MovePieceToTile(new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1));
+        }
     }
 
     private void UpdateAccessibleTilesVisual(List<Vector2> accessibleTiles)
@@ -50,36 +83,4 @@ public class VisualManager : Singleton<VisualManager>
         return tilesVisual[(int)(location.y * 8 + location.x)];
     }
 
-    public void PlacePieceOnBoard()
-    {
-        foreach(BoardLayout.BoardSquareSetup boardSquare in boardLayout.BoardSquares)
-        {
-            int index = boardSquare.TeamColor == TeamColor.White ? 0 : 6;
-            switch(boardSquare.pieceType)
-            {
-                case PieceType.King:
-                    break;
-                case PieceType.Queen:
-                    index += 1;
-                    break;
-                case PieceType.Rook:
-                    index += 2;
-                    break;
-                case PieceType.Knight:
-                    index += 3;
-                    break;
-                case PieceType.Bishop:
-                    index += 4;
-                    break;
-                case PieceType.Pawn:
-                    index += 5;
-                    break;
-            }
-            GameObject g = Instantiate(piecesPrefab[index], Vector3.zero, Quaternion.identity, parentTransformPieceInstantiate);
-            PieceVisual p = g.GetComponent<PieceVisual>();
-            new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1);
-            
-            p.MovePieceToTile(new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1));
-        }
-    }
 }

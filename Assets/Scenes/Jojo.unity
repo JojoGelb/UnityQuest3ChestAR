@@ -10335,6 +10335,10 @@ MonoBehaviour:
   onPieceSelected:
     m_PersistentCalls:
       m_Calls: []
+  onBoardInit:
+    m_PersistentCalls:
+      m_Calls: []
+  boardLayoutFromInspector: {fileID: 11400000, guid: f305cf3b523620a478a44693c5a6ff8e, type: 2}
 --- !u!4 &655967016
 Transform:
   m_ObjectHideFlags: 0
@@ -22514,7 +22518,6 @@ MonoBehaviour:
   - {fileID: 4101413691551206381, guid: 87decfe91fd18af45adf1b586ad7534b, type: 3}
   - {fileID: 2450914259783148506, guid: 421bfbcab7a1416488e84ea85ba85533, type: 3}
   parentTransformPieceInstantiate: {fileID: 1514762150}
-  boardLayout: {fileID: 11400000, guid: f305cf3b523620a478a44693c5a6ff8e, type: 2}
 --- !u!4 &1514762150
 Transform:
   m_ObjectHideFlags: 0

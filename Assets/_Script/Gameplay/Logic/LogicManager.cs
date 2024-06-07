@@ -18,8 +18,9 @@ public class LogicManager
     public BitBoard GetCurrentBitBoard() { return _currentBitBoard; }
     public Vector2 GetCurrentPiece() { return _currentPiece; }
 
-    public void InitBoard()
+    public void InitBoard(BoardLayout boardLayout)
     {
+        _boardLayout = boardLayout;
         _board.Clear();
         foreach (var boardSquare in _boardLayout.BoardSquares)
         {

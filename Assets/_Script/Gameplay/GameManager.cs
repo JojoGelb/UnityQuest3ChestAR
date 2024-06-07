@@ -17,11 +17,15 @@ public class GameManager : Singleton<GameManager>
     
     public UnityEvent<List<Vector2>> onPieceSelected = new ();
     public UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit = new ();
-    
+
+    //Temporary
+    [SerializeField] private BoardLayout boardLayoutFromInspector;
+
+
     private void Start()
     {
         //Initiate logicBoard
-        _logicManager.InitBoard();
+        _logicManager.InitBoard(boardLayoutFromInspector);
         
         //Call event to notify visualManager
         onBoardInit.Invoke(_logicManager.GetBoardSquareSetup());
