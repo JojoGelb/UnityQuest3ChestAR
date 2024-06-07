@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,6 +16,16 @@ public class GameManager : Singleton<GameManager>
     private readonly LogicManager _logicManager = new();
     
     public UnityEvent<List<Vector2>> onPieceSelected = new ();
+    public UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit = new ();
+    
+    private void Start()
+    {
+        //Initiate logicBoard
+        _logicManager.InitBoard();
+        
+        //Call event to notify visualManager
+        onBoardInit.Invoke(_logicManager.GetBoardSquareSetup());
+    }
 
     public void SelectPiece(Vector2 position)
     {

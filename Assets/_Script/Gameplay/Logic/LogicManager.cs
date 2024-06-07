@@ -12,9 +12,46 @@ public class LogicManager
     private readonly BitBoard _currentBitBoard = new();
     private Vector2 _currentPiece;
     
+    private BoardLayout _boardLayout;
+    
     public Board GetBoard() { return _board; }
     public BitBoard GetCurrentBitBoard() { return _currentBitBoard; }
     public Vector2 GetCurrentPiece() { return _currentPiece; }
+
+    public void InitBoard()
+    {
+        _board.Clear();
+        foreach (var boardSquare in _boardLayout.BoardSquares)
+        {
+            _board.Set(
+                boardSquare.position, 
+                new Piece(boardSquare.pieceType, boardSquare.TeamColor == TeamColor.White)
+            );
+        }
+    }
+
+    public BoardLayout.BoardSquareSetup[] GetBoardSquareSetup()
+    {
+        var boardSquares = new List<BoardLayout.BoardSquareSetup>();
+
+        for (var x = 0; x < Board.Size; x++)
+        {
+            for (var y = 0; y < Board.Size; y++)
+            {
+                var piece = _board.Get(x, y);
+                var square = new BoardLayout.BoardSquareSetup
+                {
+                    position = new Vector2Int(x, y),
+                    pieceType = piece.Type,
+                    TeamColor = piece.Color ? TeamColor.White : TeamColor.Black
+                };
+
+                boardSquares.Add(square);
+            }
+        }
+
+        return boardSquares.ToArray();
+    }
 
     public List<Vector2> SelectPiece(Vector2 position)
     {

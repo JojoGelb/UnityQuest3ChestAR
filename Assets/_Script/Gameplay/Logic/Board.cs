@@ -31,11 +31,7 @@ public class Board
     {
         //Create the 8x8 Grid
         _data = new Piece[Size*Size];
-        for (var i = 0; i < Size*Size; i++)
-        {
-            _data[i] = new Piece(PieceType.None, false);
-        }
-        
+        Clear();
     }
     
     public Piece Get(Vector2 pos) { return Get((int) pos.x,(int) pos.y); }
@@ -62,6 +58,14 @@ public class Board
         Set(sx, sy, Get(fx, fy));
 
         return result;
+    }
+
+    public void Clear()
+    {
+        for (var i = 0; i < _data.Length; i++)
+        {
+            _data[i] = new Piece(PieceType.None, false);
+        }
     }
 
 }
