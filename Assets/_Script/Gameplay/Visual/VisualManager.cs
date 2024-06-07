@@ -27,8 +27,20 @@ public class VisualManager : Singleton<VisualManager>
         GameManager.Instance.onPieceSelected.AddListener(UpdateAccessibleTilesVisual);
     }
 
+    private void ClearBoard()
+    {
+        foreach(TileVisual tile in tilesVisual)
+        {
+            Destroy(tile.CurrentPieceOnTile.gameObject);
+            tile.ToggleHighlightVisual(false);
+        }
+    }
+
     private void InitBoard(BoardLayout.BoardSquareSetup[] board)
     {
+
+        ClearBoard();
+
         foreach (BoardLayout.BoardSquareSetup boardSquare in board)
         {
             int index = boardSquare.TeamColor == TeamColor.White ? 0 : 6;
@@ -56,7 +68,7 @@ public class VisualManager : Singleton<VisualManager>
             PieceVisual p = g.GetComponent<PieceVisual>();
             new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1);
 
-            p.MovePieceToTile(new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1));
+            p.MovePieceToTile(new Vector2(boardSquare.position.x, boardSquare.position.y));
         }
     }
 
