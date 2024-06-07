@@ -31,7 +31,8 @@ public class VisualManager : Singleton<VisualManager>
     {
         foreach(TileVisual tile in tilesVisual)
         {
-            Destroy(tile.CurrentPieceOnTile.gameObject);
+            if(tile.CurrentPieceOnTile != null)
+                Destroy(tile.CurrentPieceOnTile.gameObject);
             tile.ToggleHighlightVisual(false);
         }
     }
@@ -66,9 +67,8 @@ public class VisualManager : Singleton<VisualManager>
             }
             GameObject g = Instantiate(piecesPrefab[index], Vector3.zero, Quaternion.identity, parentTransformPieceInstantiate);
             PieceVisual p = g.GetComponent<PieceVisual>();
-            new Vector2(boardSquare.position.x - 1, boardSquare.position.y - 1);
 
-            p.MovePieceToTile(new Vector2(boardSquare.position.x, boardSquare.position.y));
+            p.MovePieceToTile(new Vector2(boardSquare.position.x-1, boardSquare.position.y-1));
         }
     }
 
