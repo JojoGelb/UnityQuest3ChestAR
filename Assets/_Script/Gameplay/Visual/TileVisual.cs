@@ -9,6 +9,7 @@ public class TileVisual : MonoBehaviour
     [SerializeField] private Color possibleMoveTileColor = Color.yellow;
     [SerializeField] private Color selectedTileColor = Color.green;
 
+    //From 0 to 7
     [field: SerializeField] public Vector2 position { get; private set; }
 
     [Header("Algo de placement scene en mode editor")]
@@ -64,8 +65,8 @@ public class TileVisual : MonoBehaviour
                 GameObject g = Instantiate(gameObject, transform.position, Quaternion.identity, transform.parent);
                 g.transform.localPosition = transform.localPosition + new Vector3(distanceBetweenTiles.x * j, distanceBetweenTiles.y * i, 0);
                 TileVisual tileVisual = g.GetComponent<TileVisual>();
-                tileVisual.position = new Vector2(j, i);
-                g.name = "Tile_X" + j + "_Y" + i;
+                tileVisual.position = new Vector2(j+1, i+1);
+                g.name = "Tile_X" + (j+1) + "_Y" + (i+1);
             }
         }
     }

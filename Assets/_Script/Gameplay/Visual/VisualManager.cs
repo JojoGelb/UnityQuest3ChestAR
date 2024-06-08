@@ -68,7 +68,7 @@ public class VisualManager : Singleton<VisualManager>
             GameObject g = Instantiate(piecesPrefab[index], Vector3.zero, Quaternion.identity, parentTransformPieceInstantiate);
             PieceVisual p = g.GetComponent<PieceVisual>();
 
-            p.MovePieceToTile(new Vector2(boardSquare.position.x-1, boardSquare.position.y-1));
+            p.MovePieceToTile(new Vector2(boardSquare.position.x, boardSquare.position.y));
         }
     }
 
@@ -92,7 +92,8 @@ public class VisualManager : Singleton<VisualManager>
 
     public TileVisual GetTileVisualAtLocation(Vector2 location)
     {
-        return tilesVisual[(int)(location.y * 8 + location.x)];
+        if(location.x == 0 || location.y == 0) return null;
+        return tilesVisual[(int)((location.y-1) * 8 + (location.x-1))];
     }
 
 }

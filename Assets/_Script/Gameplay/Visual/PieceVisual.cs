@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class PieceVisual : MonoBehaviour
 {
+    //From 1 to 8
     public Vector2 Position { get; private set; }
     public IInteractableView InteractableView { get; private set; }
 
@@ -56,18 +57,20 @@ public class PieceVisual : MonoBehaviour
                 break;
             case InteractableState.Disabled:
                 Debug.Log("Legumed");
-                OnPieceDrop();
+                //OnPieceDrop();
                 break;
         }
     }
 
+    [ContextMenu("Select")]
     private void OnPieceSelected()
     {
+        Debug.Log(Position);
         GameManager.Instance.SelectPiece(Position);
         isGrabbed=true;
     }
 
-
+    [ContextMenu("Drop")]
     private void OnPieceDrop()
     {
         if (!isGrabbed) return;
@@ -149,7 +152,8 @@ public class PieceVisual : MonoBehaviour
         }
 
         newTile.CurrentPieceOnTile = this;
-        oldTile.CurrentPieceOnTile = null;
+        if(oldTile != null)
+            oldTile.CurrentPieceOnTile = null;
     }
 
     private void OnTriggerEnter(Collider other)

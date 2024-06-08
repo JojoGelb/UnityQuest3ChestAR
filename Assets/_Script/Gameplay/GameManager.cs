@@ -33,9 +33,11 @@ public class GameManager : Singleton<GameManager>
 
     public void SelectPiece(Vector2 position)
     {
+        Debug.Log("MANAGER: Piece selected by visual = " + position);
         //call to logic to get available position on board
         var pieces = _logicManager.SelectPiece(position);
-        
+        Debug.Log("MANAGER: NumTiles returned by logic = " + pieces.Count);
+
         //Call event to notify visualManager
         onPieceSelected.Invoke(pieces);
     }
