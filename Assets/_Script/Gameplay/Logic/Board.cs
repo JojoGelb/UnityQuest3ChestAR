@@ -56,6 +56,7 @@ public class Board
         
         //Move (sx, sy) to (fx, fy)
         Set(fx, fy, Get(sx, sy));
+        Set(sx, sy, new Piece(PieceType.None, false));
 
         return result;
     }
