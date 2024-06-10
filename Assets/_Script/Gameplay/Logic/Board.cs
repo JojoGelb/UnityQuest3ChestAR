@@ -55,7 +55,7 @@ public class Board
         var result = Get(fx, fy).Type != PieceType.None;
         
         //Move (sx, sy) to (fx, fy)
-        Set(sx, sy, Get(fx, fy));
+        Set(fx, fy, Get(sx, sy));
 
         return result;
     }
