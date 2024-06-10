@@ -2,6 +2,7 @@ using Oculus.Interaction;
 using Oculus.Interaction.HandGrab;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PieceVisual : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class PieceVisual : MonoBehaviour
 
     [SerializeField, Interface(typeof(IInteractableView))]
     private UnityEngine.Object _interactableView;
+
+    public static UnityEvent EventOnPieceSelected = new UnityEvent();
 
 
     private void Awake()
@@ -68,13 +71,21 @@ public class PieceVisual : MonoBehaviour
         Debug.Log(Position);
         GameManager.Instance.SelectPiece(Position);
         isGrabbed=true;
+        EventOnPieceSelected.Invoke();
+        EventOnPieceSelected.AddListener(Deselect);
+    }
+
+    private void Deselect()
+    {
+        lastClosestIlluminatedTile = null;
+        isGrabbed = false;
+        EventOnPieceSelected.RemoveListener(Deselect);
     }
 
     [ContextMenu("Drop")]
     private void OnPieceDrop()
     {
         if (!isGrabbed) return;
-        isGrabbed = false;
         transform.rotation = Quaternion.identity;
         //get position player want to move to
         if(tilesNearby.Count == 0)
@@ -105,11 +116,14 @@ public class PieceVisual : MonoBehaviour
         {
             case MoveState.Success:
             case MoveState.Eaten:
+                Debug.Log("Success: " + destination);
                 MovePieceToTile(destination);
+                VisualManager.Instance.CleanAccessibleTileVisual();
                 lastClosestIlluminatedTile = null;
                 break;
 
             case MoveState.Failed:
+                Debug.Log("Failed: " + destination);
                 MovePieceToTile(Position);
                 lastClosestIlluminatedTile = null;
                 break;

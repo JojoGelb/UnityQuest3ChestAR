@@ -72,17 +72,21 @@ public class VisualManager : Singleton<VisualManager>
         }
     }
 
-    private void UpdateAccessibleTilesVisual(List<Vector2> accessibleTiles)
+    public void CleanAccessibleTileVisual()
     {
-        //clear illuminated tiles
         foreach (var tile in illuminatedTile)
         {
             tile.ToggleHighlightVisual(false);
         }
         illuminatedTile.Clear();
+    }
+
+    private void UpdateAccessibleTilesVisual(List<Vector2> accessibleTiles)
+    {
+        CleanAccessibleTileVisual();
 
         //toggle and shift new illuminated tiles
-        foreach(Vector2 v in accessibleTiles)
+        foreach (Vector2 v in accessibleTiles)
         {
             TileVisual tile = tilesVisual[(int)(v.y * 8 + v.x)];
             tile.ToggleHighlightVisual(true);
