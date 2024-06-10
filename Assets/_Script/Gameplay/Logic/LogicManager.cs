@@ -58,7 +58,8 @@ public class LogicManager
 
     public List<Vector2> SelectPiece(Vector2 position)
     {
-        _currentPiece = position - new Vector2(1, 1);
+        _currentPiece = new Vector2(position.x - 1, position.y - 1);
+        _currentBitBoard.Clear();
         ManageValidMoves(); //Update BitBoard
         
         return _currentBitBoard.GetValidMoves();
@@ -85,7 +86,7 @@ public class LogicManager
         {
             case PieceType.Pawn:
                 BitBoardCast(
-                   (piece.Color) ? Vector2.up : Vector2.down, 
+                   (piece.Color) ? Vector2.right : Vector2.left, 
                    _currentPiece, 1
                 );
                 break;
@@ -143,7 +144,7 @@ public class LogicManager
         var piece = _board.Get(startPosition);
         if (piece.Type == PieceType.None) return false;
         
-        direction.Normalize();
+        direction = GetDirectionalVector(direction);
         // Not a valid direction
         if (direction.Equals(Vector2.zero)) return false;
         
@@ -152,7 +153,7 @@ public class LogicManager
         var nextPosition = startPosition + direction;
         for (var i = 0; i < length; i++)
         {
-            var nextState = CheckCastMove(direction, nextPosition, piece.Color);
+            var nextState = CheckCastMove(nextPosition, piece.Color);
             if(UpdateBitBoard(nextState, nextPosition)) break;
             
             nextPosition += direction;
@@ -161,14 +162,11 @@ public class LogicManager
         return true;
     }
     
-    private CheckMoveState CheckCastMove(Vector2 direction, Vector2 position, bool color)
+    private CheckMoveState CheckCastMove(Vector2 nextPosition, bool color)
     {
-        direction.Normalize();
-        
         //check next position
-        var nextPosition = position + direction;
         if (nextPosition.x < 0 || nextPosition.y < 0) return CheckMoveState.ExitBoard; //Top exit
-        if (nextPosition.x > Board.Size || nextPosition.y > Board.Size) return CheckMoveState.ExitBoard; //Bottom exit  
+        if (nextPosition.x >= Board.Size || nextPosition.y >= Board.Size) return CheckMoveState.ExitBoard; //Bottom exit  
         
         //check next piece
         var nextPiece = _board.Get(nextPosition);
@@ -195,6 +193,13 @@ public class LogicManager
             case CheckMoveState.ExitBoard: return true;
             default: return true;
         }
+    }
+
+    private static Vector2 GetDirectionalVector(Vector2 vector)
+    {
+        float x = vector.x < 0 ? -1 : vector.x > 0 ? 1 : 0;
+        float y = vector.y < 0 ? -1 : vector.y > 0 ? 1 : 0;
+        return new Vector2(x, y);
     }
 
 

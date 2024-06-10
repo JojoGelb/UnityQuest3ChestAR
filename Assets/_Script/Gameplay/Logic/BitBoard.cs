@@ -29,6 +29,11 @@ public class BitBoard
         _data[y * Size + x] = data;
     }
 
+    public void Clear()
+    {
+        for (var i = 0; i < Size * Size; i++) _data[i] = false;
+    }
+
     private static Vector2 GetPosition(int i)
     {
         Debug.Assert(i < Size*Size, "Error : Index out of range");
@@ -39,7 +44,7 @@ public class BitBoard
         var positions = new List<Vector2>();
         for (var i = 0; i < Size*Size; i++)
         {
-            if (_data[i]) positions.Add( GetPosition(i) + new Vector2(1, 1));
+            if (_data[i]) positions.Add( new Vector2(GetPosition(i).x, GetPosition(i).y));
         }
         return positions;
     } 
