@@ -1,5 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Meta.WitAi.Json;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Networking;
 
 public enum CheckMoveState
 {
@@ -8,7 +14,7 @@ public enum CheckMoveState
 
 public class LogicManager
 {
-    private readonly Board _board = new();
+    private Board _board = new();
     private readonly BitBoard _currentBitBoard = new();
     private Vector2 _currentPiece;
     
@@ -127,9 +133,8 @@ public class LogicManager
                 BitBoardCast(new Vector2(1, -1), _currentPiece, 1);
                 BitBoardCast(new Vector2(-1, -1), _currentPiece, 1);
                 break;
-
-            default:
-                break;
+            
+            default: throw new ArgumentOutOfRangeException();
         }
 
         return true;
@@ -154,7 +159,6 @@ public class LogicManager
                 }
             }
         }
-        
         
         //EnemyPiece on diagonals
         if (CheckMove(_currentPiece + direction + Vector2.up, color) == CheckMoveState.EnemyPiece)
@@ -262,6 +266,95 @@ public class LogicManager
         float y = vector.y < 0 ? -1 : vector.y > 0 ? 1 : 0;
         return new Vector2(x, y);
     }
+    
+    
+    public IEnumerator GetNewChessChallenge(UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit)
+    {
+        const string uri = "https://api.chess.com/pub/puzzle/random";
+        using var webRequest = UnityWebRequest.Get(uri);
+        
+        // Request and wait for the desired page.
+        yield return webRequest.SendWebRequest();
+        
+        switch (webRequest.result)
+        {
+            case UnityWebRequest.Result.ConnectionError:
+            case UnityWebRequest.Result.DataProcessingError:
+            case UnityWebRequest.Result.ProtocolError:
+                Debug.LogError("Cannot get chess.com challenge, Error: " + webRequest.error);
+                break;
+            
+            case UnityWebRequest.Result.Success:
+                Debug.Log("Received: " + webRequest.downloadHandler.text);
+                
+                //Parse result to json
+                var request = JsonConvert.DeserializeObject<Dictionary<string, string>>(webRequest.downloadHandler.text);
+                
+                if (!request.ContainsKey("pgn"))
+                {
+                    Debug.LogError("Cannot get chess.com challenge, Error: PGN not found");
+                    break;
+                }
+                
+                CreateChallengeBoard(request["pgn"]); // Update Board with PGN
+                onBoardInit.Invoke(GetBoardSquareSetup()); // Send new board to visual
+                break;
+            
+            case UnityWebRequest.Result.InProgress: break;
+            default: throw new ArgumentOutOfRangeException();
+        }
+    }
 
+    private void CreateChallengeBoard(string pgn)
+    {
+        var fen = GetFenFromPgn(pgn);
+        var challengeBoard = new Board();
+        
+        var parts = fen.Split(' ');
+        var rows = parts[0].Split('/');
+        for (var row = 0; row < rows.Length; row++)
+        {
+            var col = 0;
+            foreach (var c in rows[row])
+            {
+                if (char.IsDigit(c))
+                {
+                    col += (int)char.GetNumericValue(c);
+                }
+                else
+                {
+                    var isWhite = char.IsUpper(c);
+                    var type = GetPieceTypeFromFenChar(char.ToLower(c));
+                    var boardRow = 8 - row;
+                    var boardCol = col + 1;
+                    
+                    challengeBoard.Set(boardRow - 1, boardCol - 1, new Piece(type, isWhite));
+                    col++;
+                }
+            }
+        }
+        
+        _board = challengeBoard;
+    }
 
+    private static PieceType GetPieceTypeFromFenChar(char c)
+    {
+        return char.ToLower(c) switch
+        {
+            'p' => PieceType.Pawn,
+            'r' => PieceType.Rook,
+            'n' => PieceType.Knight,
+            'b' => PieceType.Bishop,
+            'q' => PieceType.Queen,
+            'k' => PieceType.King,
+            _ => PieceType.None
+        };
+    }
+
+    private static string GetFenFromPgn(string pgn)
+    {
+        const string pattern = @"\[FEN\s+\""(?<fen>.*?)\""\]";
+        var match = Regex.Match(pgn, pattern);
+        return match.Success ? match.Groups["fen"].Value : string.Empty;
+    }
 }

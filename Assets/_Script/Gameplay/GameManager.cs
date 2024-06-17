@@ -17,8 +17,6 @@ public class GameManager : Singleton<GameManager>
     
     public UnityEvent<List<Vector2>> onPieceSelected = new ();
     public UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit = new ();
-
-    public UnityEvent<Vector2Int> onDeletePiece = new();
     
     //Temporary
     [SerializeField] private BoardLayout boardLayoutFromInspector;
@@ -51,5 +49,10 @@ public class GameManager : Singleton<GameManager>
         return _logicManager.MoveTo(x, y);
         
         //Update visual according to returned enum
+    }
+
+    public void GetNewChallenge()
+    {
+        StartCoroutine(_logicManager.GetNewChessChallenge(onBoardInit));
     }
 }
