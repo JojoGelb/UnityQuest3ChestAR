@@ -85,10 +85,7 @@ public class LogicManager
         switch (piece.Type)
         {
             case PieceType.Pawn:
-                BitBoardCast(
-                   (piece.Color) ? Vector2.right : Vector2.left, 
-                   _currentPiece, 1
-                );
+                ManagePawn(piece.Color);
                 break;
             
             case PieceType.Bishop:
@@ -99,6 +96,7 @@ public class LogicManager
                 break;
             
             case PieceType.Knight:
+                ManageKnight(piece.Color);
                 break; //TODO Check One Case
             
             case PieceType.Rook:
@@ -138,6 +136,69 @@ public class LogicManager
 
     }
 
+    private void ManagePawn(bool color)
+    {
+        var direction = (color) ? Vector2.right : Vector2.left;
+        
+        //Empty Pos in front
+        if (CheckMove(_currentPiece + direction, color) == CheckMoveState.EmptyPosition)
+        {
+            BitBoardCast(direction, _currentPiece, 1);
+            
+            //Move two squares on first move
+            if (CheckMove(_currentPiece + direction * 2, color) == CheckMoveState.EmptyPosition)
+            {
+                if (color ? (int) _currentPiece.x == 1 : (int) _currentPiece.x == Board.Size - 2)
+                {
+                    BitBoardCast(direction, _currentPiece, 2);
+                }
+            }
+        }
+        
+        
+        //EnemyPiece on diagonals
+        if (CheckMove(_currentPiece + direction + Vector2.up, color) == CheckMoveState.EnemyPiece)
+        {
+            BitBoardCast(direction + Vector2.up, _currentPiece, 1);
+        }
+        if (CheckMove(_currentPiece + direction + Vector2.down, color) == CheckMoveState.EnemyPiece)
+        {
+            BitBoardCast(direction + Vector2.down, _currentPiece, 1);
+        }
+        
+        //En Passant
+        if (CheckMove(_currentPiece + direction, color) == CheckMoveState.EnemyPiece && 
+            CheckMove(_currentPiece + direction + Vector2.down, color) == CheckMoveState.EmptyPosition &&
+            CheckMove(_currentPiece + direction + Vector2.up, color) == CheckMoveState.EmptyPosition)
+        {
+            BitBoardCast(direction + Vector2.down, _currentPiece, 1);
+            BitBoardCast(direction + Vector2.up, _currentPiece, 1);
+            //TODO En Passant
+        }
+    }
+
+    private void ManageKnight(bool color)
+    {
+        var knightPosList = new[]
+        {
+            new Vector2(2, 1),
+            new Vector2(2, -1),
+            new Vector2(-2, 1),
+            new Vector2(-2, -1),
+            
+            new Vector2(1, 2),
+            new Vector2(-1, 2),
+            new Vector2(1, -2),
+            new Vector2(-1, -2)
+        };
+
+        foreach (var pos in knightPosList)
+        {
+            UpdateBitBoard(CheckMove(_currentPiece + pos, color), _currentPiece + pos);
+        }
+
+    }
+    
     private bool BitBoardCast(Vector2 direction, Vector2 startPosition, int length = -1)
     {
         // If the piece at start position don't exist
@@ -153,7 +214,7 @@ public class LogicManager
         var nextPosition = startPosition + direction;
         for (var i = 0; i < length; i++)
         {
-            var nextState = CheckCastMove(nextPosition, piece.Color);
+            var nextState = CheckMove(nextPosition, piece.Color);
             if(UpdateBitBoard(nextState, nextPosition)) break;
             
             nextPosition += direction;
@@ -162,14 +223,14 @@ public class LogicManager
         return true;
     }
     
-    private CheckMoveState CheckCastMove(Vector2 nextPosition, bool color)
+    private CheckMoveState CheckMove(Vector2 position, bool color)
     {
         //check next position
-        if (nextPosition.x < 0 || nextPosition.y < 0) return CheckMoveState.ExitBoard; //Top exit
-        if (nextPosition.x >= Board.Size || nextPosition.y >= Board.Size) return CheckMoveState.ExitBoard; //Bottom exit  
+        if (position.x < 0 || position.y < 0) return CheckMoveState.ExitBoard; //Top exit
+        if (position.x >= Board.Size || position.y >= Board.Size) return CheckMoveState.ExitBoard; //Bottom exit  
         
         //check next piece
-        var nextPiece = _board.Get(nextPosition);
+        var nextPiece = _board.Get(position);
         //If the next position is empty
         if (nextPiece.Type == PieceType.None) return CheckMoveState.EmptyPosition;
         

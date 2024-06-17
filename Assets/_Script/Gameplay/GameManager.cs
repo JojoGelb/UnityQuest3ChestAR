@@ -18,6 +18,8 @@ public class GameManager : Singleton<GameManager>
     public UnityEvent<List<Vector2>> onPieceSelected = new ();
     public UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit = new ();
 
+    public UnityEvent<Vector2Int> onDeletePiece = new();
+    
     //Temporary
     [SerializeField] private BoardLayout boardLayoutFromInspector;
 
