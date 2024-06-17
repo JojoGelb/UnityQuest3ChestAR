@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum PieceType
@@ -66,6 +67,43 @@ public class Board
         for (var i = 0; i < _data.Length; i++)
         {
             _data[i] = new Piece(PieceType.None, false);
+        }
+    }
+
+    public BoardLayout.BoardSquareSetup[] GetBoardSquareSetup()
+    {
+        var boardSquares = new List<BoardLayout.BoardSquareSetup>();
+
+        for (var x = 0; x < Board.Size; x++)
+        {
+            for (var y = 0; y < Board.Size; y++)
+            {
+                var piece = Get(x, y);
+                if(piece.Type == PieceType.None) continue;
+
+                var square = new BoardLayout.BoardSquareSetup
+                {
+                    position = new Vector2Int(x + 1, y + 1),
+                    pieceType = piece.Type,
+                    TeamColor = piece.Color ? TeamColor.White : TeamColor.Black
+                };
+
+                boardSquares.Add(square);
+            }
+        }
+
+        return boardSquares.ToArray();
+    }
+
+    public void ConvertBoardSquare(BoardLayout.BoardSquareSetup[] boardSquares)
+    {
+        Clear();
+        foreach (var boardSquare in boardSquares)
+        {
+            Set(
+                boardSquare.position - new Vector2(1, 1), 
+                new Piece(boardSquare.pieceType, boardSquare.TeamColor == TeamColor.White)
+            );
         }
     }
 

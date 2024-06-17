@@ -20,48 +20,19 @@ public class LogicManager
     
     private BoardLayout _boardLayout;
     
-    public Board GetBoard() { return _board; }
-    public BitBoard GetCurrentBitBoard() { return _currentBitBoard; }
-    public Vector2 GetCurrentPiece() { return _currentPiece; }
-
+    // Initiate Board with BoardSquares
     public void InitBoard(BoardLayout boardLayout)
     {
         _boardLayout = boardLayout;
-        _board.Clear();
-        foreach (var boardSquare in _boardLayout.BoardSquares)
-        {
-            _board.Set(
-                boardSquare.position - new Vector2(1, 1), 
-                new Piece(boardSquare.pieceType, boardSquare.TeamColor == TeamColor.White)
-            );
-        }
+        _board.ConvertBoardSquare(_boardLayout.BoardSquares);
     }
-
+    
+    // Get BoardSquares from board
     public BoardLayout.BoardSquareSetup[] GetBoardSquareSetup()
     {
-        var boardSquares = new List<BoardLayout.BoardSquareSetup>();
-
-        for (var x = 0; x < Board.Size; x++)
-        {
-            for (var y = 0; y < Board.Size; y++)
-            {
-                var piece = _board.Get(x, y);
-                if(piece.Type == PieceType.None) continue;
-
-                var square = new BoardLayout.BoardSquareSetup
-                {
-                    position = new Vector2Int(x + 1, y + 1),
-                    pieceType = piece.Type,
-                    TeamColor = piece.Color ? TeamColor.White : TeamColor.Black
-                };
-
-                boardSquares.Add(square);
-            }
-        }
-
-        return boardSquares.ToArray();
+        return _board.GetBoardSquareSetup();
     }
-
+    
     public List<Vector2> SelectPiece(Vector2 position)
     {
         _currentPiece = new Vector2(position.x - 1, position.y - 1);
@@ -83,10 +54,11 @@ public class LogicManager
         return MoveState.Failed;
     }
 
-    private bool ManageValidMoves()
+    // Update the inner BitBoard with the valid move from the selected piece
+    private void ManageValidMoves()
     {
         var piece = _board.Get(_currentPiece);
-        if (piece.Type == PieceType.None) return false;
+        if (piece.Type == PieceType.None) return;
 
         switch (piece.Type)
         {
@@ -134,13 +106,13 @@ public class LogicManager
                 BitBoardCast(new Vector2(-1, -1), _currentPiece, 1);
                 break;
             
+            case PieceType.None: break;
             default: throw new ArgumentOutOfRangeException();
         }
 
-        return true;
-
     }
-
+    
+    // Manage Pawn valid moves logic
     private void ManagePawn(bool color)
     {
         var direction = (color) ? Vector2.right : Vector2.left;
@@ -177,41 +149,36 @@ public class LogicManager
         {
             BitBoardCast(direction + Vector2.down, _currentPiece, 1);
             BitBoardCast(direction + Vector2.up, _currentPiece, 1);
-            //TODO En Passant
+            //TODO Delete Front Pawn
         }
     }
-
+    
+    // Manage Knight valid moves logic
     private void ManageKnight(bool color)
     {
         var knightPosList = new[]
         {
-            new Vector2(2, 1),
-            new Vector2(2, -1),
-            new Vector2(-2, 1),
-            new Vector2(-2, -1),
-            
-            new Vector2(1, 2),
-            new Vector2(-1, 2),
-            new Vector2(1, -2),
-            new Vector2(-1, -2)
+            new Vector2(2, 1), new Vector2(2, -1), 
+            new Vector2(-2, 1), new Vector2(-2, -1),
+            new Vector2(1, 2), new Vector2(-1, 2), 
+            new Vector2(1, -2), new Vector2(-1, -2)
         };
 
         foreach (var pos in knightPosList)
         {
             UpdateBitBoard(CheckMove(_currentPiece + pos, color), _currentPiece + pos);
         }
-
     }
     
-    private bool BitBoardCast(Vector2 direction, Vector2 startPosition, int length = -1)
+    private void BitBoardCast(Vector2 direction, Vector2 startPosition, int length = -1)
     {
         // If the piece at start position don't exist
         var piece = _board.Get(startPosition);
-        if (piece.Type == PieceType.None) return false;
+        if (piece.Type == PieceType.None) return;
         
         direction = GetDirectionalVector(direction);
         // Not a valid direction
-        if (direction.Equals(Vector2.zero)) return false;
+        if (direction.Equals(Vector2.zero)) return;
         
         // Cast logic 
         if (length < 0) length = Board.Size;
@@ -223,10 +190,9 @@ public class LogicManager
             
             nextPosition += direction;
         }
-        
-        return true;
     }
     
+    // Check if this move is valid or not
     private CheckMoveState CheckMove(Vector2 position, bool color)
     {
         //check next position
@@ -241,7 +207,8 @@ public class LogicManager
         //If the next piece is the same color
         return (nextPiece.Color == color) ? CheckMoveState.AllyPiece : CheckMoveState.EnemyPiece;
     }
-
+    
+    // Update Bit Board with the MoveState
     private bool UpdateBitBoard(CheckMoveState state, Vector2 nextPosition)
     {
         switch (state)
@@ -267,7 +234,7 @@ public class LogicManager
         return new Vector2(x, y);
     }
     
-    
+    //Make a request to get a new challenge from chess.com
     public IEnumerator GetNewChessChallenge(UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit)
     {
         const string uri = "https://api.chess.com/pub/puzzle/random";
@@ -304,10 +271,19 @@ public class LogicManager
             default: throw new ArgumentOutOfRangeException();
         }
     }
-
+    
+    // Update logic with a given pgn
     private void CreateChallengeBoard(string pgn)
     {
         var fen = GetFenFromPgn(pgn);
+        _board = GetBoardFromFen(fen);
+        
+        //TODO Get next color from PGN
+        //TODO Get all next moves from PGN
+    }
+
+    private static Board GetBoardFromFen(string fen)
+    {
         var challengeBoard = new Board();
         
         var parts = fen.Split(' ');
@@ -333,10 +309,10 @@ public class LogicManager
                 }
             }
         }
-        
-        _board = challengeBoard;
-    }
 
+        return challengeBoard;
+    }
+    
     private static PieceType GetPieceTypeFromFenChar(char c)
     {
         return char.ToLower(c) switch
