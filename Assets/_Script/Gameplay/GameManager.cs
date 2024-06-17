@@ -17,6 +17,7 @@ public class GameManager : Singleton<GameManager>
     
     public UnityEvent<List<Vector2>> onPieceSelected = new ();
     public UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit = new ();
+    public UnityEvent<TeamColor> onPawnPromotion = new();
     
     //Temporary
     [SerializeField] private BoardLayout boardLayoutFromInspector;
@@ -46,9 +47,14 @@ public class GameManager : Singleton<GameManager>
     {
         
         //call to logic to move piece on board
-        return _logicManager.MoveTo(x, y);
+        return _logicManager.MoveTo(x, y, onPawnPromotion);
         
         //Update visual according to returned enum
+    }
+
+    public void PromotePawn(PieceType newType)
+    {
+        _logicManager.PromotePawn(newType);
     }
 
     public void GetNewChallenge()

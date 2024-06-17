@@ -17,6 +17,7 @@ public class LogicManager
     private Board _board = new();
     private readonly BitBoard _currentBitBoard = new();
     private Vector2 _currentPiece;
+    private Vector2 _lastPieceMoved;
     
     private BoardLayout _boardLayout;
     
@@ -42,12 +43,21 @@ public class LogicManager
         return _currentBitBoard.GetValidMoves();
     }
     
-    public MoveState MoveTo(int x, int y)
+    public MoveState MoveTo(int x, int y, UnityEvent<TeamColor> onPawnPromotion)
     {
         var newPosition = new Vector2(x - 1, y - 1);
         
         if (_currentBitBoard.Get(newPosition))
         {
+            //Check for Pawn Promotion
+            var selectedPiece = _board.Get(_currentPiece);
+            if (IsPawnPromoting(selectedPiece, x))
+            {
+                onPawnPromotion.Invoke(selectedPiece.Color ? TeamColor.White : TeamColor.Black);
+            }
+            
+            //Move Pawn
+            _lastPieceMoved = newPosition;
             return _board.Move(_currentPiece, newPosition) ? MoveState.Eaten : MoveState.Success;
         }
 
@@ -332,5 +342,18 @@ public class LogicManager
         const string pattern = @"\[FEN\s+\""(?<fen>.*?)\""\]";
         var match = Regex.Match(pgn, pattern);
         return match.Success ? match.Groups["fen"].Value : string.Empty;
+    }
+
+    private static bool IsPawnPromoting(Piece selectedPiece, int x)
+    {
+        return selectedPiece.Type == PieceType.Pawn && (selectedPiece.Color ? x == 0 : x == Board.Size - 1);
+    }
+
+    public void PromotePawn(PieceType newType)
+    {
+        var pawn = _board.Get(_lastPieceMoved);
+        if(!IsPawnPromoting(pawn, (int) _lastPieceMoved.x)) return;
+        
+        _board.Set(_lastPieceMoved, new Piece(newType, pawn.Color));
     }
 }
