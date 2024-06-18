@@ -14,7 +14,7 @@ public class ShaderChanger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        objectRenderer = GetComponent<Renderer>();
+        objectRenderer = GetComponentInChildren<Renderer>();
 
         if (objectRenderer != null && defaultMaterial != null) {
             objectRenderer.material = defaultMaterial; 
