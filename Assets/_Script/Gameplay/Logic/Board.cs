@@ -107,5 +107,23 @@ public class Board
         }
     }
 
+    public List<Vector2Int> GetAllPositions(PieceType type, bool turn)
+    {
+        var list = new List<Vector2Int>();
+
+        for (var x = 0; x < Board.Size; x++)
+        {
+            for (var y = 0; y < Board.Size; y++)
+            {
+                var piece = Get(x, y);
+                if(piece.Type != type || piece.Color != turn) continue;
+                
+                list.Add(new Vector2Int(x, y));
+            }
+        }
+
+        return list;
+    }
+    
 }
 
