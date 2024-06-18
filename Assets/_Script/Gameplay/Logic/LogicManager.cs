@@ -21,6 +21,18 @@ public class LogicManager
     
     private BoardLayout _boardLayout;
     
+    public struct ChessMove
+    {
+        public Vector2Int Start { get; set; }
+        public Vector2Int End { get; set; }
+
+        public ChessMove(Vector2Int start, Vector2Int end)
+        {
+            Start = start;
+            End = end;
+        }
+    }
+    
     // Initiate Board with BoardSquares
     public void InitBoard(BoardLayout boardLayout)
     {
@@ -244,6 +256,19 @@ public class LogicManager
         return new Vector2(x, y);
     }
     
+    private static bool IsPawnPromoting(Piece selectedPiece, int x)
+    {
+        return selectedPiece.Type == PieceType.Pawn && (selectedPiece.Color ? x == 0 : x == Board.Size - 1);
+    }
+
+    public void PromotePawn(PieceType newType)
+    {
+        var pawn = _board.Get(_lastPieceMoved);
+        if(!IsPawnPromoting(pawn, (int) _lastPieceMoved.x)) return;
+        
+        _board.Set(_lastPieceMoved, new Piece(newType, pawn.Color));
+    }
+    
     //Make a request to get a new challenge from chess.com
     public IEnumerator GetNewChessChallenge(UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit)
     {
@@ -344,16 +369,32 @@ public class LogicManager
         return match.Success ? match.Groups["fen"].Value : string.Empty;
     }
 
-    private static bool IsPawnPromoting(Piece selectedPiece, int x)
+    private static Queue<ChessMove> GetPgnMoves(string pgn)
     {
-        return selectedPiece.Type == PieceType.Pawn && (selectedPiece.Color ? x == 0 : x == Board.Size - 1);
+        var queue = new Queue<ChessMove>();
+        var movesSection = pgn.Split(new[] { "\r\n\r\n" }, StringSplitOptions.None)[1];
+        var moveTokens = movesSection.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var token in moveTokens)
+        {
+            if (!IsValidMove(token)) continue;
+            var move = ConvertToMove(token);
+            queue.Enqueue(move);
+        }
+
+        return queue;
     }
 
-    public void PromotePawn(PieceType newType)
+    private static bool IsValidMove(string token)
     {
-        var pawn = _board.Get(_lastPieceMoved);
-        if(!IsPawnPromoting(pawn, (int) _lastPieceMoved.x)) return;
-        
-        _board.Set(_lastPieceMoved, new Piece(newType, pawn.Color));
+        return Regex.IsMatch(token, @"^[a-h][1-8][a-h][1-8]$");
     }
+
+    private static ChessMove ConvertToMove(string move)
+    {
+        var start = new Vector2Int(move[0] - 'a', move[1] - '1');
+        var end = new Vector2Int(move[2] - 'a', move[3] - '1');
+        return new ChessMove(start, end);
+    }
+   
 }
