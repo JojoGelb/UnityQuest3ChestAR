@@ -96,8 +96,12 @@ public class PieceVisual : MonoBehaviour
     {
         if (!isGrabbed) return;
         transform.rotation = Quaternion.identity;
+
+        // Update renderer
+        shaderChanger.OnRelease();
+
         //get position player want to move to
-        if(tilesNearby.Count == 0)
+        if (tilesNearby.Count == 0)
         {
             //Failed: no tile in range
             MovePieceToTile(Position);
@@ -139,9 +143,6 @@ public class PieceVisual : MonoBehaviour
                 lastClosestIlluminatedTile = null;
                 break;
         }
-
-        // Update renderer
-        shaderChanger.OnRelease();
     }
 
     private void EndTurn() {
