@@ -79,6 +79,7 @@ public class LogicManager
             
             //Move Pawn
             _lastPieceMoved = newPosition;
+            _isWhiteTurn = !_isWhiteTurn;
             return _board.Move(_currentPiece, newPosition) ? MoveState.Eaten : MoveState.Success;
         }
 
@@ -91,6 +92,7 @@ public class LogicManager
         _currentBitBoard.Clear();
         var piece = _board.Get(_currentPiece);
         if (piece.Type == PieceType.None) return;
+        if(piece.Color != _isWhiteTurn) return; 
         
         switch (piece.Type)
         {
