@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Meta.WitAi.Json;
 using UnityEngine;
@@ -12,26 +13,35 @@ public enum CheckMoveState
     EmptyPosition, AllyPiece, EnemyPiece, ExitBoard
 }
 
+public struct ChessMove
+{
+    public Vector2Int Start { get; }
+    public Vector2Int End { get; }
+
+    public bool DoesEat { get; }
+
+    public ChessMove(Vector2Int start, Vector2Int end, bool doesEat = false)
+    {
+        Start = start;
+        End = end;
+        DoesEat = doesEat;
+    }
+}
+
 public class LogicManager
 {
     private Board _board = new();
     private readonly BitBoard _currentBitBoard = new();
     private Vector2 _currentPiece;
     private Vector2 _lastPieceMoved;
+
+    private Queue<ChessMove> _nextChallengeMoves;
+    private ChessMove _playerNextMove;
+    private ChessMove _enemyLastMove;
+    private bool _isWhiteTurn = true;
+    private bool _isPlayerWhite = true;
     
     private BoardLayout _boardLayout;
-    
-    public struct ChessMove
-    {
-        public Vector2Int Start { get; set; }
-        public Vector2Int End { get; set; }
-
-        public ChessMove(Vector2Int start, Vector2Int end)
-        {
-            Start = start;
-            End = end;
-        }
-    }
     
     // Initiate Board with BoardSquares
     public void InitBoard(BoardLayout boardLayout)
@@ -49,17 +59,16 @@ public class LogicManager
     public List<Vector2> SelectPiece(Vector2 position)
     {
         _currentPiece = new Vector2(position.x - 1, position.y - 1);
-        _currentBitBoard.Clear();
         ManageValidMoves(); //Update BitBoard
         
         return _currentBitBoard.GetValidMoves();
     }
     
-    public MoveState MoveTo(int x, int y, UnityEvent<TeamColor> onPawnPromotion)
+    public MoveState MoveTo(int x, int y, UnityEvent<TeamColor> onPawnPromotion, bool force = false)
     {
         var newPosition = new Vector2(x - 1, y - 1);
         
-        if (_currentBitBoard.Get(newPosition))
+        if (_currentBitBoard.Get(newPosition) || force)
         {
             //Check for Pawn Promotion
             var selectedPiece = _board.Get(_currentPiece);
@@ -70,6 +79,7 @@ public class LogicManager
             
             //Move Pawn
             _lastPieceMoved = newPosition;
+            _isWhiteTurn = !_isWhiteTurn;
             return _board.Move(_currentPiece, newPosition) ? MoveState.Eaten : MoveState.Success;
         }
 
@@ -79,9 +89,11 @@ public class LogicManager
     // Update the inner BitBoard with the valid move from the selected piece
     private void ManageValidMoves()
     {
+        _currentBitBoard.Clear();
         var piece = _board.Get(_currentPiece);
         if (piece.Type == PieceType.None) return;
-
+        if(piece.Color != _isWhiteTurn) return; 
+        
         switch (piece.Type)
         {
             case PieceType.Pawn:
@@ -97,7 +109,7 @@ public class LogicManager
             
             case PieceType.Knight:
                 ManageKnight(piece.Color);
-                break; //TODO Check One Case
+                break;
             
             case PieceType.Rook:
                 BitBoardCast(Vector2.up , _currentPiece);
@@ -269,8 +281,14 @@ public class LogicManager
         _board.Set(_lastPieceMoved, new Piece(newType, pawn.Color));
     }
     
+    
+    
+    
     //Make a request to get a new challenge from chess.com
-    public IEnumerator GetNewChessChallenge(UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit)
+    public IEnumerator GetNewChessChallenge(
+        UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit,
+        UnityEvent onChallengeBegin
+    )
     {
         const string uri = "https://api.chess.com/pub/puzzle/random";
         using var webRequest = UnityWebRequest.Get(uri);
@@ -297,9 +315,17 @@ public class LogicManager
                     Debug.LogError("Cannot get chess.com challenge, Error: PGN not found");
                     break;
                 }
-                
-                CreateChallengeBoard(request["pgn"]); // Update Board with PGN
+
+                if (!CreateChallengeBoard(request["pgn"])) // Update Board with PGN
+                {
+                    Debug.LogError("Cannot create moves, Error: challenge not supported");
+                    
+                    yield return new WaitForSeconds(15);
+                    GameManager.Instance.GetNewChallenge();
+                    break;
+                } 
                 onBoardInit.Invoke(GetBoardSquareSetup()); // Send new board to visual
+                onChallengeBegin.Invoke();
                 break;
             
             case UnityWebRequest.Result.InProgress: break;
@@ -308,13 +334,21 @@ public class LogicManager
     }
     
     // Update logic with a given pgn
-    private void CreateChallengeBoard(string pgn)
+    private bool CreateChallengeBoard(string pgn)
     {
         var fen = GetFenFromPgn(pgn);
         _board = GetBoardFromFen(fen);
         
-        //TODO Get next color from PGN
-        //TODO Get all next moves from PGN
+        // Get next color from PGN
+        _isPlayerWhite = GetPlayerColorFromFen(fen);
+        _isWhiteTurn = _isPlayerWhite;
+        
+        // Get next moves list from PGN
+        _nextChallengeMoves = GetPgnMoves(pgn);
+        if (!_nextChallengeMoves.Any()) return false;
+        
+        _playerNextMove = _nextChallengeMoves.Dequeue();
+        return true;
     }
 
     private static Board GetBoardFromFen(string fen)
@@ -369,32 +403,160 @@ public class LogicManager
         return match.Success ? match.Groups["fen"].Value : string.Empty;
     }
 
-    private static Queue<ChessMove> GetPgnMoves(string pgn)
+    private static bool GetPlayerColorFromFen(string fen)
+    {
+        var fenParts = fen.Split(' ');
+        if (fenParts.Length < 2)
+        {
+            return true;
+        }
+        
+        var color = fenParts[1];
+        return color switch
+        {
+            "w" => true,
+            "b" => false,
+            _ => true
+        };
+    }
+
+    private Queue<ChessMove> GetPgnMoves(string pgn)
     {
         var queue = new Queue<ChessMove>();
-        var movesSection = pgn.Split(new[] { "\r\n\r\n" }, StringSplitOptions.None)[1];
-        var moveTokens = movesSection.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var token in moveTokens)
+        var moves = ExtractPgnMoves(pgn);
+        var turn = _isWhiteTurn;
+        var simulatedBoard = _board;
+        
+        foreach (var move in moves)
         {
-            if (!IsValidMove(token)) continue;
-            var move = ConvertToMove(token);
-            queue.Enqueue(move);
+            var type = GetPieceTypeFromAlgebraic(move);
+            var end = GetEndFromAlgebraic(move);
+            if (end.x < 0 || end.y < 0) continue;
+            
+            var start = FoundStartPosition(simulatedBoard, type, end, turn);
+            if (start.x < 0 || start.y < 0)
+            {
+                return new Queue<ChessMove>();
+            }
+            
+            queue.Enqueue(new ChessMove(start, end));
+            simulatedBoard.Move(start, end);
+            
+            turn = !turn;
         }
 
         return queue;
     }
-
-    private static bool IsValidMove(string token)
+    
+    private static PieceType GetPieceTypeFromAlgebraic(string algebraicNotation)
     {
-        return Regex.IsMatch(token, @"^[a-h][1-8][a-h][1-8]$");
+        if (char.IsLower(algebraicNotation[0])) return PieceType.Pawn;
+        return algebraicNotation[0] switch
+        {
+            'R' => PieceType.Rook,
+            'N' => PieceType.Knight,
+            'B' => PieceType.Bishop,
+            'Q' => PieceType.Queen,
+            'K' => PieceType.King,
+            _ => PieceType.None
+        };
     }
 
-    private static ChessMove ConvertToMove(string move)
+    private static Vector2Int GetEndFromAlgebraic(string algebraicNotation)
     {
-        var start = new Vector2Int(move[0] - 'a', move[1] - '1');
-        var end = new Vector2Int(move[2] - 'a', move[3] - '1');
-        return new ChessMove(start, end);
+        const string pattern = @"[a-h][1-8]";
+        var match = Regex.Matches(algebraicNotation, pattern);
+
+        if (match.Count == 0) return new Vector2Int(-1, -1);
+        
+        var stringPos = match[^1].Value;
+        
+        return new Vector2Int(
+            (int)char.GetNumericValue(stringPos[1]) - 1,
+            stringPos[0] - 'a'
+        );
+    }
+
+    private Vector2Int FoundStartPosition(Board board, PieceType type, Vector2Int end, bool turn)
+    {
+        foreach (var position in board.GetAllPositions(type, turn))
+        {
+            _currentPiece = position;
+            ManageValidMoves();
+            
+            if (_currentBitBoard.Get(end))
+            {
+                return position;
+            }
+        }
+        
+        
+        Debug.Log("Fail to find Start End : " + end.x + "; " + end.y);
+        return new Vector2Int(-1, -1);
+    }
+    
+    private static List<string> ExtractPgnMoves(string pgn)
+    {
+        var moves = new List<string>();
+
+        // Find the section of the PGN containing the moves
+        const string pattern = @"\d+\.\s*(\S+)\s+(\S+)";
+        var matches = Regex.Matches(pgn, pattern);
+
+        foreach (Match match in matches)
+        {
+            moves.Add(match.Groups[1].Value);
+            
+            if (match.Groups[2].Success)
+            {
+                moves.Add(match.Groups[2].Value);
+            }
+        }
+
+        return moves;
+    }
+    
+    public MoveState CheckChallengeMove(int x, int y, UnityEvent<TeamColor> onPawnPromotion)
+    {
+        if(_isPlayerWhite != _isWhiteTurn) return MoveState.Failed;
+        
+        var position = new Vector2Int(x - 1, y - 1);
+        if (_playerNextMove.Start == _currentPiece && _playerNextMove.End == position)
+        {
+            _isWhiteTurn = !_isWhiteTurn;
+            return MoveTo(x, y, onPawnPromotion, true);
+        }
+
+        return MoveState.Failed;
+    }
+
+    public ChessMove GetNextChallengeMove()
+    {
+        if (_isWhiteTurn == _isPlayerWhite) return _enemyLastMove;
+
+        var triggerEat = false;
+        if (!IsChallengeFinish())
+        {
+            _enemyLastMove = _nextChallengeMoves.Dequeue();
+            triggerEat = _board.Move(_enemyLastMove.Start, _enemyLastMove.End);
+        }
+        if(!IsChallengeFinish()) _playerNextMove = _nextChallengeMoves.Dequeue();
+        
+        return new ChessMove(
+            _enemyLastMove.Start + new Vector2Int(1, 1),
+            _enemyLastMove.End + new Vector2Int(1, 1),
+            triggerEat
+        );
+    }
+
+    public bool IsChallengeFinish()
+    {
+        return !_nextChallengeMoves.Any();
+    }
+
+    public bool GetPlayerColor()
+    {
+        return _isPlayerWhite;
     }
    
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -19,11 +20,22 @@ public class GameManager : Singleton<GameManager>
     public UnityEvent<BoardLayout.BoardSquareSetup[]> onBoardInit = new ();
     public UnityEvent<TeamColor> onPawnPromotion = new();
     
+    public UnityEvent<Vector2Int> onEnPassant = new(); //Pawn to delete
+    public UnityEvent<Vector2Int, Vector2Int> onRook = new(); //Old Rook Pos, New Rook Pos
+    
+    public UnityEvent onChallengeBegin = new();
+    public UnityEvent onChallengeWin = new();
+    
     //Temporary
     [SerializeField] private BoardLayout boardLayoutFromInspector;
 
 
     private void Start()
+    {
+        ResetBoard();
+    }
+
+    public void ResetBoard()
     {
         //Initiate logicBoard
         _logicManager.InitBoard(boardLayoutFromInspector);
@@ -59,6 +71,25 @@ public class GameManager : Singleton<GameManager>
 
     public void GetNewChallenge()
     {
-        StartCoroutine(_logicManager.GetNewChessChallenge(onBoardInit));
+        StartCoroutine(_logicManager.GetNewChessChallenge(onBoardInit, onChallengeBegin));
     }
+
+    public ChessMove GetNextChallengeMove()
+    {
+        return _logicManager.GetNextChallengeMove();
+    }
+
+    public MoveState CheckChallengeMove(int x, int y)
+    {
+        var state = _logicManager.CheckChallengeMove(x, y, onPawnPromotion);
+        if(state != MoveState.Failed && _logicManager.IsChallengeFinish()) onChallengeWin.Invoke();
+        return state;
+    }
+
+    public TeamColor GetPlayerColor()
+    {
+        return _logicManager.GetPlayerColor() ? TeamColor.White : TeamColor.Black;
+    }
+    
+    
 }
