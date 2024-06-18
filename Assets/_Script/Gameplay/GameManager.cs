@@ -32,6 +32,11 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
+        ResetBoard();
+    }
+
+    public void ResetBoard()
+    {
         //Initiate logicBoard
         _logicManager.InitBoard(boardLayoutFromInspector);
         
