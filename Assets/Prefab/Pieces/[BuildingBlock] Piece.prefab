@@ -161,6 +161,7 @@ GameObject:
   - component: {fileID: 3844111363545569619}
   - component: {fileID: 6518115509028124296}
   - component: {fileID: 2127610179204984653}
+  - component: {fileID: 5859602379786961575}
   m_Layer: 9
   m_Name: '[BuildingBlock] Piece'
   m_TagString: Untagged
@@ -198,8 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0ab092e6bf30e44d87086540551d271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  position: {x: 0, y: 0}
-  isGrabbed: 0
+  shaderChanger: {fileID: 5859602379786961575}
   _interactableView: {fileID: 2733650549223816630}
 --- !u!65 &6518115509028124296
 BoxCollider:
@@ -249,6 +249,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &5859602379786961575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5300682634817598934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c13c8949c9b17047885bf6f0beb2294, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultMaterial: {fileID: 2100000, guid: 973635ff02379f4429b7df0543346d32, type: 2}
+  grabbedMaterial: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
 --- !u!1 &7514389221642375539
 GameObject:
   m_ObjectHideFlags: 0

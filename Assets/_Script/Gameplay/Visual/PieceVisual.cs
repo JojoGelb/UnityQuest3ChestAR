@@ -11,6 +11,8 @@ public class PieceVisual : MonoBehaviour
     public Vector2 Position { get; private set; }
     public IInteractableView InteractableView { get; private set; }
 
+    public ShaderChanger shaderChanger;
+
     private List<TileVisual> tilesNearby = new List<TileVisual>();
     private TileVisual lastClosestIlluminatedTile;
     private bool isGrabbed = false;
@@ -74,6 +76,9 @@ public class PieceVisual : MonoBehaviour
         isGrabbed=true;
         EventOnPieceSelected.Invoke();
         EventOnPieceSelected.AddListener(Deselect);
+
+        // Update renderer
+        shaderChanger.OnGrab();
     }
 
     private void Deselect()
@@ -81,6 +86,9 @@ public class PieceVisual : MonoBehaviour
         lastClosestIlluminatedTile = null;
         isGrabbed = false;
         EventOnPieceSelected.RemoveListener(Deselect);
+
+        // Update renderer
+        shaderChanger.OnRelease();
     }
 
     [ContextMenu("Drop")]
@@ -131,6 +139,9 @@ public class PieceVisual : MonoBehaviour
                 lastClosestIlluminatedTile = null;
                 break;
         }
+
+        // Update renderer
+        shaderChanger.OnRelease();
     }
 
     private void EndTurn() {

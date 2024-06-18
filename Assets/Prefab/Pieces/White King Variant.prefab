@@ -56,6 +56,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: White King Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 5859602379786961575, guid: d011e6d5e5c88054dbe52f1f58a5f8c0, type: 3}
+      propertyPath: defaultMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: b391301c47109a144bbb6408e48da028, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
