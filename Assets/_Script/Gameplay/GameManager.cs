@@ -37,7 +37,6 @@ public class GameManager : Singleton<GameManager>
         
         //Call event to notify visualManager
         onBoardInit.Invoke(_logicManager.GetBoardSquareSetup());
-        GetNewChallenge();
     }
 
     public void SelectPiece(Vector2 position)
