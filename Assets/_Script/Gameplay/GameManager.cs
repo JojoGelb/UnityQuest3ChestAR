@@ -69,6 +69,7 @@ public class GameManager : Singleton<GameManager>
         _logicManager.PromotePawn(newType);
     }
 
+    [ContextMenu("GetNewChallenge")]
     public void GetNewChallenge()
     {
         StartCoroutine(_logicManager.GetNewChessChallenge(onBoardInit, onChallengeBegin));

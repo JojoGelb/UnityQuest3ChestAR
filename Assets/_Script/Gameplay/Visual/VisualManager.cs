@@ -20,11 +20,84 @@ public class VisualManager : Singleton<VisualManager>
 
     private List<TileVisual> illuminatedTile = new List<TileVisual>();
 
+    public TeamColor playerColor = TeamColor.White;
+
+    public bool IsPromoting = false;
+
     protected override void Awake()
     {
         base.Awake();
         GameManager.Instance.onBoardInit.AddListener(InitBoard);
         GameManager.Instance.onPieceSelected.AddListener(UpdateAccessibleTilesVisual);
+        GameManager.Instance.onEnPassant.AddListener(UpdateEnPassant);
+        GameManager.Instance.onRook.AddListener(UpdateRook);
+
+        //To remove later on
+        GameManager.Instance.onPawnPromotion.AddListener(TEST);
+    }
+
+    private void TEST(TeamColor arg0)
+    {
+        Debug.Log("ON PAWN PROMOTION TRIGGERED");
+    }
+
+    public void PromotePieceTo(Vector2 position, PieceType pieceType, TeamColor color)
+    {  
+        int index = color == TeamColor.White ? 0 : 6;
+            switch (pieceType)
+            {
+                case PieceType.King:
+                    break;
+                case PieceType.Queen:
+                    index += 1;
+                    break;
+                case PieceType.Rook:
+                    index += 2;
+                    break;
+                case PieceType.Knight:
+                    index += 3;
+                    break;
+                case PieceType.Bishop:
+                    index += 4;
+                    break;
+                case PieceType.Pawn:
+                    index += 5;
+                    break;
+            }
+
+        GameObject g = Instantiate(piecesPrefab[index], Vector3.zero, Quaternion.identity, parentTransformPieceInstantiate);
+        PieceVisual p = g.GetComponent<PieceVisual>();
+
+        p.MovePieceToTile(position);
+        IsPromoting = false;
+        GameManager.Instance.PromotePawn(pieceType);
+
+        if(color == playerColor)
+            EndChallengePlayerTurn();
+
+    }
+
+    public void EndChallengePlayerTurn() {
+        if(IsPromoting) return;
+
+        ChessMove move = GameManager.Instance.GetNextChallengeMove();
+        TileVisual tile = GetTileVisualAtLocation(move.Start);
+        PieceVisual piece = tile.CurrentPieceOnTile;
+        piece.MovePieceToTile(move.End);
+    }
+
+    private void UpdateRook(Vector2Int initialRookPos, Vector2Int newRookPos)
+    {
+        TileVisual tile = GetTileVisualAtLocation(initialRookPos);
+        PieceVisual piece = tile.CurrentPieceOnTile;
+        piece.MovePieceToTile(newRookPos);
+    }
+
+    private void UpdateEnPassant(Vector2Int deletedPiecePosition)
+    {
+        TileVisual tile = GetTileVisualAtLocation(deletedPiecePosition);
+        Destroy(tile.CurrentPieceOnTile.gameObject);
+        tile.CurrentPieceOnTile=null;
     }
 
     private void ClearBoard()
@@ -70,6 +143,7 @@ public class VisualManager : Singleton<VisualManager>
 
             p.MovePieceToTile(new Vector2(boardSquare.position.x, boardSquare.position.y));
         }
+        playerColor = GameManager.Instance.GetPlayerColor();
     }
 
     public void CleanAccessibleTileVisual()

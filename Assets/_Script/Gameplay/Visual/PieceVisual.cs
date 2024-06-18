@@ -1,5 +1,6 @@
 using Oculus.Interaction;
 using Oculus.Interaction.HandGrab;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -106,7 +107,7 @@ public class PieceVisual : MonoBehaviour
         }
 
         Vector2 destination = tilesNearby[indexClosestIlluminatedTile].position;
-
+        GameManager.Instance.onPawnPromotion.AddListener(StartPromotion);
         //ask manager if move is possible
         MoveState result = GameManager.Instance.MoveTo((int)destination.x,(int)destination.y);
         // Debug line: allow to place piece everytime
@@ -119,6 +120,8 @@ public class PieceVisual : MonoBehaviour
                 Debug.Log("Success: " + destination);
                 MovePieceToTile(destination);
                 VisualManager.Instance.CleanAccessibleTileVisual();
+                //Let a small delay in case a piece need to be promoted
+                Invoke(nameof(EndTurn),0.1f);
                 lastClosestIlluminatedTile = null;
                 break;
 
@@ -128,6 +131,21 @@ public class PieceVisual : MonoBehaviour
                 lastClosestIlluminatedTile = null;
                 break;
         }
+    }
+
+    private void EndTurn() {
+        GameManager.Instance.onPawnPromotion.RemoveListener(StartPromotion);
+        VisualManager.Instance.EndChallengePlayerTurn();
+    }
+
+    //Only called after a player move a piece
+    private void StartPromotion(TeamColor arg0)
+    {
+        VisualManager.Instance.IsPromoting = true;
+        //Launch visual for promotion
+            
+        //Once done: 
+        // VisualManager.Instance.PromotePieceTo(Position, PieceType.Queen, arg0);
     }
 
     private int GetClosestIlluminatedTile()
