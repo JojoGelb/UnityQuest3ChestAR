@@ -72,7 +72,7 @@ public class LogicManager
         {
             //Check for Pawn Promotion
             var selectedPiece = _board.Get(_currentPiece);
-            if (IsPawnPromoting(selectedPiece, x))
+            if (IsPawnPromoting(selectedPiece, x - 1))
             {
                 onPawnPromotion.Invoke(selectedPiece.Color ? TeamColor.White : TeamColor.Black);
             }
