@@ -270,7 +270,7 @@ public class LogicManager
     
     private static bool IsPawnPromoting(Piece selectedPiece, int x)
     {
-        return selectedPiece.Type == PieceType.Pawn && (selectedPiece.Color ? x == 0 : x == Board.Size - 1);
+        return selectedPiece.Type == PieceType.Pawn && (selectedPiece.Color ? x == Board.Size - 1 : x == 0);
     }
 
     public void PromotePawn(PieceType newType)
