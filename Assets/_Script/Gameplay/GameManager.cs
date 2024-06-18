@@ -21,7 +21,7 @@ public class GameManager : Singleton<GameManager>
     public UnityEvent<TeamColor> onPawnPromotion = new();
     
     public UnityEvent<Vector2Int> onEnPassant = new(); //Pawn to delete
-    public UnityEvent<Vector2Int> onRook = new(); //New King Position
+    public UnityEvent<Vector2Int, Vector2Int> onRook = new(); //Old Rook Pos, New Rook Pos
     
     public UnityEvent onChallengeBegin = new();
     public UnityEvent onChallengeWin = new();
