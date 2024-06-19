@@ -106,7 +106,8 @@ public class PieceVisual : MonoBehaviour
         {
             //Failed: no tile in range
             MovePieceToTile(Position);
-
+            Deselect();
+            VisualManager.Instance.CleanAccessibleTileVisual();
             return;
         }
 
@@ -116,6 +117,8 @@ public class PieceVisual : MonoBehaviour
         {
             //Failed: no illuminated tile in range
             MovePieceToTile(Position);
+            Deselect();
+            VisualManager.Instance.CleanAccessibleTileVisual();
             return;
         }
 
@@ -134,6 +137,7 @@ public class PieceVisual : MonoBehaviour
             case MoveState.Eaten:
                 Debug.Log("Success: " + destination);
                 MovePieceToTile(destination);
+                Deselect();
                 VisualManager.Instance.CleanAccessibleTileVisual();
                 //Let a small delay in case a piece need to be promoted
                 Invoke(nameof(EndTurn),0.1f);
@@ -143,7 +147,9 @@ public class PieceVisual : MonoBehaviour
             case MoveState.Failed:
                 Debug.Log("Failed: " + destination);
                 MovePieceToTile(Position);
+                Deselect();
                 lastClosestIlluminatedTile = null;
+                VisualManager.Instance.CleanAccessibleTileVisual();
                 break;
         }
     }

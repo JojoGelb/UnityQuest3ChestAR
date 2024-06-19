@@ -23,6 +23,7 @@ public class VisualManager : Singleton<VisualManager>
     public TeamColor playerColor = TeamColor.White;
 
     public bool IsPromoting = false;
+    private bool challengeFinished = false;
 
     protected override void Awake()
     {
@@ -31,9 +32,16 @@ public class VisualManager : Singleton<VisualManager>
         GameManager.Instance.onPieceSelected.AddListener(UpdateAccessibleTilesVisual);
         GameManager.Instance.onEnPassant.AddListener(UpdateEnPassant);
         GameManager.Instance.onRook.AddListener(UpdateRook);
+        GameManager.Instance.onChallengeWin.AddListener(OnChallengeWin);
 
         //To remove later on
         GameManager.Instance.onPawnPromotion.AddListener(TEST);
+    }
+    private void OnChallengeWin()
+    {
+        Debug.Log("CHALLENGE WON");
+        challengeFinished = true;
+
     }
 
     private void TEST(TeamColor arg0)
@@ -79,7 +87,11 @@ public class VisualManager : Singleton<VisualManager>
 
     public void EndChallengePlayerTurn() {
         if(IsPromoting) return;
-
+        if(challengeFinished) {
+            GameManager.Instance.GetNewChallenge();
+            challengeFinished = false;
+            return;
+        }
         ChessMove move = GameManager.Instance.GetNextChallengeMove();
         TileVisual tile = GetTileVisualAtLocation(move.Start);
         Debug.Log("Start: " + move.Start + " End: " + move.End);
