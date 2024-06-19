@@ -542,6 +542,7 @@ public class LogicManager
         if (!IsChallengeFinish())
         {
             _enemyLastMove = _nextChallengeMoves.Dequeue();
+            _isWhiteTurn = !_isWhiteTurn;
             triggerEat = _board.Move(_enemyLastMove.Start, _enemyLastMove.End);
         }
         if(!IsChallengeFinish()) _playerNextMove = _nextChallengeMoves.Dequeue();
