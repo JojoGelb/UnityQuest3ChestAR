@@ -35,6 +35,21 @@ public class Board
         Clear();
     }
     
+    public Board(Board board)
+    {
+        //Create the 8x8 Grid
+        _data = new Piece[Size*Size];
+        Clear();
+        
+        for (var x = 0; x < Board.Size; x++)
+        {
+            for (var y = 0; y < Board.Size; y++)
+            {
+                Set(x, y, board.Get(x, y));
+            }
+        }
+    }
+    
     public Piece Get(Vector2 pos) { return Get((int) pos.x,(int) pos.y); }
     public Piece Get(int x, int y)
     {

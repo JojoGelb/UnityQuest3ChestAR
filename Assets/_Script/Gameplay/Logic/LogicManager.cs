@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Meta.WitAi.Json;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
@@ -339,7 +340,8 @@ public class LogicManager
     private bool CreateChallengeBoard(string pgn)
     {
         var fen = GetFenFromPgn(pgn);
-        _board = GetBoardFromFen(fen);
+        var fenBoard = GetBoardFromFen(fen);
+        _board = new Board(fenBoard);
         
         // Get next color from PGN
         _isPlayerWhite = GetPlayerColorFromFen(fen);
@@ -350,6 +352,7 @@ public class LogicManager
         if (!_nextChallengeMoves.Any()) return false;
         
         _playerNextMove = _nextChallengeMoves.Dequeue();
+        _board = new Board(fenBoard);
         return true;
     }
 
@@ -372,10 +375,10 @@ public class LogicManager
                 {
                     var isWhite = char.IsUpper(c);
                     var type = GetPieceTypeFromFenChar(char.ToLower(c));
-                    var boardRow = 8 - row;
-                    var boardCol = col + 1;
+                    var boardRow = 7 - row;
+                    var boardCol = col;
                     
-                    challengeBoard.Set(boardRow - 1, boardCol - 1, new Piece(type, isWhite));
+                    challengeBoard.Set(boardRow, boardCol, new Piece(type, isWhite));
                     col++;
                 }
             }
@@ -427,7 +430,6 @@ public class LogicManager
         var queue = new Queue<ChessMove>();
         var moves = ExtractPgnMoves(pgn);
         var turn = _isWhiteTurn;
-        var simulatedBoard = _board;
         
         foreach (var move in moves)
         {
@@ -435,14 +437,14 @@ public class LogicManager
             var end = GetEndFromAlgebraic(move);
             if (end.x < 0 || end.y < 0) continue;
             
-            var start = FoundStartPosition(simulatedBoard, type, end, turn);
+            var start = FoundStartPosition(type, end, turn);
             if (start.x < 0 || start.y < 0)
             {
                 return new Queue<ChessMove>();
             }
             
             queue.Enqueue(new ChessMove(start, end));
-            simulatedBoard.Move(start, end);
+            _board.Move(start, end);
             
             turn = !turn;
         }
@@ -479,9 +481,9 @@ public class LogicManager
         );
     }
 
-    private Vector2Int FoundStartPosition(Board board, PieceType type, Vector2Int end, bool turn)
+    private Vector2Int FoundStartPosition(PieceType type, Vector2Int end, bool turn)
     {
-        foreach (var position in board.GetAllPositions(type, turn))
+        foreach (var position in _board.GetAllPositions(type, turn))
         {
             _currentPiece = position;
             ManageValidMoves(false);
