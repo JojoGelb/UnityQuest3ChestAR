@@ -25,6 +25,8 @@ public class VisualManager : Singleton<VisualManager>
     public bool IsPromoting = false;
     private bool challengeFinished = false;
 
+    private List<GameObject> piecesInGame = new List<GameObject>();
+
     protected override void Awake()
     {
         base.Awake();
@@ -74,6 +76,7 @@ public class VisualManager : Singleton<VisualManager>
             }
 
         GameObject g = Instantiate(piecesPrefab[index], Vector3.zero, Quaternion.identity, parentTransformPieceInstantiate);
+        piecesInGame.Add(g);
         PieceVisual p = g.GetComponent<PieceVisual>();
 
         p.MovePieceToTile(position);
@@ -89,7 +92,7 @@ public class VisualManager : Singleton<VisualManager>
     public void EndChallengePlayerTurn() {
         if(IsPromoting) return;
         if(challengeFinished) {
-            GameManager.Instance.GetNewChallenge();
+            //GameManager.Instance.GetNewChallenge();
             challengeFinished = false;
             return;
         }
@@ -119,10 +122,16 @@ public class VisualManager : Singleton<VisualManager>
     {
         foreach(TileVisual tile in tilesVisual)
         {
-            if(tile.CurrentPieceOnTile != null)
-                Destroy(tile.CurrentPieceOnTile.gameObject);
+            /*if(tile.CurrentPieceOnTile != null)
+                Destroy(tile.CurrentPieceOnTile.gameObject);*/
             tile.ToggleHighlightVisual(false);
         }
+
+        foreach(GameObject piece in piecesInGame)
+        {
+            Destroy(piece.gameObject);
+        }
+        piecesInGame.Clear();
     }
 
     private void InitBoard(BoardLayout.BoardSquareSetup[] board)
@@ -154,6 +163,7 @@ public class VisualManager : Singleton<VisualManager>
                     break;
             }
             GameObject g = Instantiate(piecesPrefab[index], Vector3.zero, Quaternion.identity, parentTransformPieceInstantiate);
+            piecesInGame.Add(g);
             PieceVisual p = g.GetComponent<PieceVisual>();
 
             p.MovePieceToTile(new Vector2(boardSquare.position.x, boardSquare.position.y));
