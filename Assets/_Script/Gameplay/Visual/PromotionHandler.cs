@@ -47,7 +47,7 @@ public class PromotionHandler : MonoBehaviour
     private void HidePromotionPanel(PieceType pieceType)
     {
         promotionPanel.SetActive(false);
-        VisualManager.Instance.PromotePieceTo(GetComponent<PieceVisual>().Position,pieceType,GameManager.Instance.GetPlayerColor());
+        VisualManager.Instance.PromotePieceTo(GetComponent<PieceVisual>().Position,pieceType,VisualManager.Instance.playerColor);
     }
 
 

@@ -122,7 +122,9 @@ public class PieceVisual : MonoBehaviour
         Vector2 destination = tilesNearby[indexClosestIlluminatedTile].position;
         GameManager.Instance.onPawnPromotion.AddListener(StartPromotion);
         //ask manager if move is possible
-        MoveState result = GameManager.Instance.MoveTo((int)destination.x,(int)destination.y);
+        //MoveState result = GameManager.Instance.MoveTo((int)destination.x,(int)destination.y);
+
+        MoveState result = GameManager.Instance.CheckChallengeMove((int)destination.x,(int)destination.y);
         // Debug line: allow to place piece everytime
         //MoveState result = MoveState.Success;
 
