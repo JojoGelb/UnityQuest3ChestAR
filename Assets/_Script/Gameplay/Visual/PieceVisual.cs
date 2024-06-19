@@ -72,6 +72,7 @@ public class PieceVisual : MonoBehaviour
     private void OnPieceSelected()
     {
         Debug.Log(Position);
+        if(VisualManager.Instance.IsPromoting) return;
         GameManager.Instance.SelectPiece(Position);
         isGrabbed=true;
         EventOnPieceSelected.Invoke();
@@ -154,6 +155,7 @@ public class PieceVisual : MonoBehaviour
     private void StartPromotion(TeamColor arg0)
     {
         VisualManager.Instance.IsPromoting = true;
+        GetComponent<PromotionHandler>().ShowPromotionPanel();
         //Launch visual for promotion
             
         //Once done: 
@@ -190,7 +192,7 @@ public class PieceVisual : MonoBehaviour
         Position = destination;
         transform.localPosition = Vector3.zero;
 
-        if (newTile.CurrentPieceOnTile != null)
+        if (newTile.CurrentPieceOnTile != null && newTile.CurrentPieceOnTile != this)
         {
             Destroy(newTile.CurrentPieceOnTile.gameObject);
         }
@@ -213,6 +215,11 @@ public class PieceVisual : MonoBehaviour
         if (other.TryGetComponent(out TileVisual t))
         {
             tilesNearby.Remove(t);
+            t.ChangeLightVisual(false);
+            if(t == lastClosestIlluminatedTile)
+            {
+                lastClosestIlluminatedTile = null;
+            }
         }
     }
 }
