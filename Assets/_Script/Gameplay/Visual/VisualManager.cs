@@ -82,6 +82,8 @@ public class VisualManager : Singleton<VisualManager>
 
         ChessMove move = GameManager.Instance.GetNextChallengeMove();
         TileVisual tile = GetTileVisualAtLocation(move.Start);
+        Debug.Log("Start: " + move.Start + " End: " + move.End);
+        Debug.Log(" OK: " + tile.CurrentPieceOnTile != null);
         PieceVisual piece = tile.CurrentPieceOnTile;
         piece.MovePieceToTile(move.End);
     }

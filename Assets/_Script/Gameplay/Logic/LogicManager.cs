@@ -527,7 +527,7 @@ public class LogicManager
         var position = new Vector2Int(x - 1, y - 1);
         if (_playerNextMove.Start == _currentPiece && _playerNextMove.End == position)
         {
-            _isWhiteTurn = !_isWhiteTurn;
+            //_isWhiteTurn = !_isWhiteTurn;
             return MoveTo(x, y, onPawnPromotion, true);
         }
 
@@ -536,7 +536,10 @@ public class LogicManager
 
     public ChessMove GetNextChallengeMove()
     {
-        if (_isWhiteTurn == _isPlayerWhite) return _enemyLastMove;
+        if (_isWhiteTurn == _isPlayerWhite) {
+            //Debug.Log("IS WHITE TURN");
+            return _enemyLastMove;
+        } 
 
         var triggerEat = false;
         if (!IsChallengeFinish())
