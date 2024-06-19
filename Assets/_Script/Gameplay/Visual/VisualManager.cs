@@ -79,6 +79,7 @@ public class VisualManager : Singleton<VisualManager>
         p.MovePieceToTile(position);
         IsPromoting = false;
         GameManager.Instance.PromotePawn(pieceType);
+        g.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
 
         if(color == playerColor)
             EndChallengePlayerTurn();
@@ -156,6 +157,7 @@ public class VisualManager : Singleton<VisualManager>
             PieceVisual p = g.GetComponent<PieceVisual>();
 
             p.MovePieceToTile(new Vector2(boardSquare.position.x, boardSquare.position.y));
+            g.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         }
         playerColor = GameManager.Instance.GetPlayerColor();
     }

@@ -71,7 +71,6 @@ public class PieceVisual : MonoBehaviour
     [ContextMenu("Select")]
     private void OnPieceSelected()
     {
-        Debug.Log(Position);
         if(VisualManager.Instance.IsPromoting) return;
         GameManager.Instance.SelectPiece(Position);
         isGrabbed=true;
@@ -126,8 +125,11 @@ public class PieceVisual : MonoBehaviour
         GameManager.Instance.onPawnPromotion.AddListener(StartPromotion);
         //ask manager if move is possible
         //MoveState result = GameManager.Instance.MoveTo((int)destination.x,(int)destination.y);
-
-        MoveState result = GameManager.Instance.CheckChallengeMove((int)destination.x,(int)destination.y);
+        MoveState result;
+        if(GameManager.Instance.IsChallenge == true)
+            result = GameManager.Instance.CheckChallengeMove((int)destination.x,(int)destination.y);
+        else
+            result = GameManager.Instance.MoveTo((int)destination.x,(int)destination.y);
         // Debug line: allow to place piece everytime
         //MoveState result = MoveState.Success;
 
@@ -140,7 +142,8 @@ public class PieceVisual : MonoBehaviour
                 Deselect();
                 VisualManager.Instance.CleanAccessibleTileVisual();
                 //Let a small delay in case a piece need to be promoted
-                Invoke(nameof(EndTurn),0.1f);
+                if(GameManager.Instance.IsChallenge == true)
+                    Invoke(nameof(EndTurn),0.1f);
                 lastClosestIlluminatedTile = null;
                 break;
 
@@ -164,6 +167,7 @@ public class PieceVisual : MonoBehaviour
     {
         VisualManager.Instance.IsPromoting = true;
         GetComponent<PromotionHandler>().ShowPromotionPanel();
+        GameManager.Instance.onPawnPromotion.RemoveListener(StartPromotion);
         //Launch visual for promotion
             
         //Once done: 

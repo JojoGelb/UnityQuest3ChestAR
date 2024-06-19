@@ -10450,6 +10450,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   boardLayoutFromInspector: {fileID: 11400000, guid: f305cf3b523620a478a44693c5a6ff8e, type: 2}
+  IsChallenge: 0
 --- !u!4 &655967016
 Transform:
   m_ObjectHideFlags: 0
