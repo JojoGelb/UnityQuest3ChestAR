@@ -180,14 +180,14 @@ public class LogicManager
         }
         
         //En Passant
-        if (CheckMove(_currentPiece + direction, color) == CheckMoveState.EnemyPiece && 
+        /*if (CheckMove(_currentPiece + direction, color) == CheckMoveState.EnemyPiece && 
             CheckMove(_currentPiece + direction + Vector2.down, color) == CheckMoveState.EmptyPosition &&
             CheckMove(_currentPiece + direction + Vector2.up, color) == CheckMoveState.EmptyPosition)
         {
             BitBoardCast(direction + Vector2.down, _currentPiece, 1);
             BitBoardCast(direction + Vector2.up, _currentPiece, 1);
             //TODO Delete Front Pawn
-        }
+        }*/
     }
     
     // Manage Knight valid moves logic
@@ -537,7 +537,6 @@ public class LogicManager
     public ChessMove GetNextChallengeMove()
     {
         if (_isWhiteTurn == _isPlayerWhite) {
-            //Debug.Log("IS WHITE TURN");
             return _enemyLastMove;
         } 
 
