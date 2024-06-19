@@ -1522,6 +1522,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23000012459057614, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
     - target: {fileID: 33000010981930260, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -1604,6 +1608,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23000012459057614, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
     - target: {fileID: 33000010981930260, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -1764,6 +1772,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23000012459057614, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
     - target: {fileID: 33000010981930260, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -1846,6 +1858,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23000012459057614, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 32a76832b79e84347ad9df08b12709c3, type: 2}
     - target: {fileID: 33000010981930260, guid: 1700328aaf96fd243a71d862897619a4, type: 3}
       propertyPath: m_Mesh
       value: 
