@@ -40,6 +40,8 @@ public class LogicManager
     private ChessMove _enemyLastMove;
     private bool _isWhiteTurn = true;
     private bool _isPlayerWhite = true;
+
+    private Vector2Int _lastMovedPawn = new Vector2Int(-1, -1); 
     
     private BoardLayout _boardLayout;
     
@@ -87,12 +89,12 @@ public class LogicManager
     }
 
     // Update the inner BitBoard with the valid move from the selected piece
-    private void ManageValidMoves()
+    private void ManageValidMoves(bool forceTurn = true)
     {
         _currentBitBoard.Clear();
         var piece = _board.Get(_currentPiece);
         if (piece.Type == PieceType.None) return;
-        if(piece.Color != _isWhiteTurn) return; 
+        if(piece.Color != _isWhiteTurn && forceTurn) return; 
         
         switch (piece.Type)
         {
@@ -482,7 +484,7 @@ public class LogicManager
         foreach (var position in board.GetAllPositions(type, turn))
         {
             _currentPiece = position;
-            ManageValidMoves();
+            ManageValidMoves(false);
             
             if (_currentBitBoard.Get(end))
             {
